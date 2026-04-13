@@ -1,0 +1,24 @@
+<MyPopup_save_worktime>:
+    size_hint: (.9,.5)
+    pos_hint: {"x_center": 1,"y": .5}
+    title: "Внимание!"
+    MDBoxLayout:
+        orientation: "vertical"
+        TitleLabel:
+            text: root.message_info
+            size_hint: 1, .5
+            halign: "center"
+            color: 1,1,1
+        MDBoxLayout:
+            Button_main:
+                on_release: root.answer_ok()
+                Button_text:
+                    pos_hint: {"center_x": .5,"center_y": .5}
+                    text: "Переписать"
+            Button_main:
+                on_release: root.dismiss()
+                Button_text:
+                    pos_hint: {"center_x": .5,"center_y": .5}
+                    text: "Отмена"
+
+
