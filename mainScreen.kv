@@ -1,0 +1,106 @@
+#:kivy 2.0.1
+#: import SlideTransition kivy.uix.screenmanager.SlideTransition
+
+
+<Screen_main>:
+    id: Screen_main
+    name: "main_screen"
+    md_bg_color:  "aquamarine"# app.theme_cls.primaryContainerColor # app.theme_cls.primaryColor # app.theme_cls.primaryContainerColor
+    MDBoxLayout:
+        orientation: "vertical"
+        padding: dp(5)
+        spacing: dp(5)
+        MDBoxLayout:
+            # md_bg_color:  "green"
+            size_hint_y: .25
+            Button_main:
+                on_release:
+                    root.manager.transition = SlideTransition()
+                    root.manager.current = "main_create_kart"
+                    root.manager.transition.direction = "left"
+                Button_text:
+                    pos_hint: {"center_x": .5,"center_y": .5}
+                    text: "Создать карту"
+        MDBoxLayout:
+            # md_bg_color:  "blue"
+            orientation: "vertical"
+            size_hint_y: .2
+            Button_main:
+                # on_release: root.create_route_kart()
+                Button_text:
+                    pos_hint: {"center_x": .5,"center_y": .5}
+                    text: "Найти карту"
+        MDBoxLayout:
+            canvas.before:
+                Color:
+                    rgba: .1,0,0,1
+                Line:
+                    width: 2
+                    rectangle: self.x,self.y,self.width,self.height
+            padding: dp(5)
+            # md_bg_color:  "red"
+            orientation: "vertical"
+            size_hint_y: .5
+            MDBoxLayout:
+                size_hint_y: .4
+                Button_main:
+                    # on_release: root.create_route_kart()
+                    id: show_karta_btn_color
+                    Button_text:
+                        id: show_karta_btn_text
+                        pos_hint: {"center_x": .5,"center_y": .5}
+                        text: "Посмотреть карту"
+            MDBoxLayout:
+                size_hint_y: .2
+                TitleLabel:
+                    id: title_show_route
+                    text: "Введите:"
+                    role: "large"
+
+            MDBoxLayout:
+                id: BoxTextInput
+                size_hint_y: .2
+                spacing: dp(10)
+                MDBoxLayout:
+                    RouteTextInputMain:
+                        id: route_number_textinput
+                        bold: True
+                        markup:True
+                        text: "Маршрут"
+                        size_hint_y: 1
+                        mode: "outlined"
+                        multiline: False
+                        font_size: dp(20)
+                        on_text: root.show_karta_btn_turn_on()
+
+                MDBoxLayout:
+                    KartaTextInputMain:
+                        id: karta_route_number_textinput
+                        text: "Карта"
+                        size_hint_y: 1
+                        mode: "outlined"
+                        multiline: False
+                        font_size: dp(20)
+                        # on_text: root.search_rout_in_dict()
+        MDBoxLayout:
+            size_hint_y: .3
+            Button_main:
+                md_bg_color: 1,.1,.1,.5
+                on_release:
+                    root.manager.transition = SlideTransition()
+                    root.manager.current = "main_page"
+                    root.manager.transition.direction = "left"
+                Button_text:
+                    pos_hint: {"center_x": .5,"center_y": .5}
+                    text: "Создать рабочий день"
+
+
+        MDBoxLayout:
+            # md_bg_color:  "yellow"
+            size_hint_y: .8
+
+
+
+
+
+

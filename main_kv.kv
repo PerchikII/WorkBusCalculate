@@ -1,0 +1,567 @@
+#: import SlideTransition kivy.uix.screenmanager.SlideTransition
+#: import sys sys
+<Button_main@MDButton>
+#    on_release: root.parent.parent.parent.choice_button(self)
+    theme_bg_color: "Custom"
+    # theme_color: "Custom"
+    md_bg_color: .1,.1,.1, 1
+    style: "outlined"
+    radius:5
+    # md_bg_color: "red"
+    # md_bg_color: "green"
+    # style: "elevated" 'md_bg_color_disabled' 'on_md_bg_color'
+    # style: "filled"
+    # style: "tonal"
+    # style: "text"
+    # pos_hint: {"bottom": 1}
+    theme_width: "Custom"
+    theme_height: "Custom"
+    size_hint: (1,.9)
+<Button_text@MDButtonText>
+    pos_hint: {"center_x": 1,"center_y": 1}
+    theme_text_color: "Custom"
+    text_color: "white"
+    theme_font_size: "Custom"
+    font_size: sp(20)
+<TimeBox@MDBoxLayout>
+    orientation: "vertical"
+    padding: 5
+    canvas.before:
+        Color:
+            rgba: 0,0,0,1
+        Line:
+            width:1
+            rectangle: self.x,self.y,self.width,self.height
+<TimeSpinner@Spinner>
+    size_hint: 1, 1
+    # pos_hint: {"right":1,"top":1}
+    font_size: sp(30)
+
+<TitleLabel@MDLabel>
+    markup: True
+    size_hint: 1, 1
+    # font_size: 30
+    #color: 0,0,0
+    font_style: "Title"
+    role: "small"
+    bold: True
+    text_size: self.size
+    halign: "center"
+    valign: "center"
+
+
+
+
+
+<Page_main>:
+    id: page_main
+    name: "main_page"
+    md_bg_color: app.theme_cls.primaryContainerColor # app.theme_cls.primaryColor # app.theme_cls.primaryContainerColor
+    MDBoxLayout:
+        id: root_main_box
+        orientation: "vertical"
+        size: root.size
+        MDBoxLayout:
+            id: TOP_box
+            padding: [sp(10),sp(10),sp(10),0]
+            size_hint_y: .8
+            MDBoxLayout:
+                id:left_box
+                orientation: "vertical"
+                MDBoxLayout:
+                    size_hint_y: .2
+                    padding: [0,0,sp(5),sp(5)]
+                    orientation: "vertical"
+                    MDBoxLayout:
+                        size_hint_y: .6
+                        TitleLabel:
+                            text: "Дата"
+                        TimeSpinner:
+                            id: spinner_day
+                            text: root.day_spinner
+                            values: map(str,list(range(1,32)))
+                    MDBoxLayout:
+                        size_hint_y: .4
+                        TimeSpinner:
+                            id: spinner_month
+                            text:  root.month_spinner_str
+                            values: root.month_spinner_lst
+                            font_size: 30
+                TimeBox:
+                    size_hint_y: .2
+                    MDBoxLayout:
+                        id: lunch_time_box
+                        size_hint: 1,1
+                        TitleLabel:
+                            text: "     установите \nНАЧАЛО ОБЕДА"
+                    MDBoxLayout:
+                        TimeSpinner:
+                            id: hoursstartlunch
+                            text: root.hours_start_lunch
+                            values: [str(i) for i in range(0,25)]
+                            on_text: root.start_calculate_work_time()
+                        TitleLabel:
+                            size_hint: .1, 1
+                            text: ":"
+                        TimeSpinner:
+                            id: minutesstartlunch
+                            text: root.minutes_start_lunch
+                            values: [str(i).zfill(2) for i in range(0,60)]
+                            on_text: root.start_calculate_work_time()
+                TimeBox:
+                    size_hint_y: .2
+                    MDBoxLayout:
+                        orientation: "vertical"
+                        padding:[20,10,20,0]
+                        TitleLabel:
+                            text: "    установите \nКОНЕЦ ОБЕДА"
+
+                    MDBoxLayout:
+                        TimeSpinner:
+                            id: hoursendlunch
+                            text: root.hours_end_lunch
+                            values: [str(x) for x in range(0,25)]
+                            on_text: root.start_calculate_work_time()
+                        TitleLabel:
+                            size_hint: .1, 1
+                            text: ":"
+                        TimeSpinner:
+                            id: minutesendlunch
+                            text: root.minutes_end_lunch
+                            values: [str(x).zfill(2) for x in range(0,60)]
+                            on_text: root.start_calculate_work_time()
+                TimeBox:
+                    size_hint_y: .3
+                    MDBoxLayout:
+                        size_hint_y: .15
+                        TitleLabel:
+                            id: root.date_a_day
+                            text: root.date_total_time
+                            role: "large"
+                    MDBoxLayout:
+                        size_hint_y: .15
+                        TitleLabel:
+                            id: savingtext
+                            text: root.lab_save_txt
+                            role: "large"
+                            halign: "center"
+                    MDBoxLayout:
+                        size_hint_y: .25
+                        TitleLabel:
+                            size_hint_x: .5
+                            text: root.total_hours_work
+                            font_style: "Headline"
+                            role: "large"
+                        TitleLabel:
+                            text: "часов"
+                            bold: False
+                            halign: "left"
+
+                    MDBoxLayout:
+                        size_hint_y: .25
+                        TitleLabel:
+                            text: root.total_minutes_work
+                            font_style: "Headline"
+                            role: "large"
+                            halign: "right"
+                        TitleLabel:
+                            size_hint_x: .5
+                            text: "мин."
+                            bold: False
+
+
+
+            MDBoxLayout:
+                id: right_box
+                orientation: "vertical"
+
+                TimeBox:
+                    padding: 5
+                    MDBoxLayout:
+                        TitleLabel:
+                            text: "установите НАЧАЛО\n      рабочего дня"
+                    MDBoxLayout:
+                        TimeSpinner:
+                            id: startworkhours
+                            text: root.hours_start_work
+                            values: [str(x) for x in range(0,25)]
+                            on_text: root.start_calculate_work_time()
+                        TitleLabel:
+                            size_hint: .1, 1
+                            text: ":"
+                        TimeSpinner:
+                            id: startworkminutes
+                            text: root.minutes_start_work
+                            values: [str(x).zfill(2) for x in range(0,60)]
+                            on_text: root.start_calculate_work_time()
+                TimeBox:
+                    padding: 5
+                    orientation: "vertical"
+                    MDBoxLayout:
+                        id: box_time_end
+                        TitleLabel:
+                            text: "установите КОНЕЦ\n      рабочего дня"
+                    MDBoxLayout:
+                        TimeSpinner:
+                            id: hoursendwork
+                            text: root.hours_end_work
+                            values: [str(x) for x in range(0,25)]
+                            on_text: root.start_calculate_work_time()
+
+                        TitleLabel:
+                            size_hint: .1, 1
+                            text: ":"
+                        TimeSpinner:
+                            id: minutesendwork
+                            text: root.minutes_end_work
+                            values: [str(x).zfill(2) for x in range(0,60)]
+                            on_text: root.start_calculate_work_time()
+                TimeBox:
+                    padding: 5
+                    orientation: "vertical"
+                    MDBoxLayout:
+                        Button:
+                            size_hint:1,1
+                            font_size: 25
+                            text: "Статистика"
+                            on_release: root.show_DICT()
+#                                root.manager.transition = SlideTransition()
+#                                root.manager.transition.direction = "left"
+#                                root.manager.current = "stat_page"
+
+
+
+                    MDBoxLayout:
+                        orientation: "vertical"
+                        size_hint:1,1
+                        TitleLabel:
+                            text: "Создать карточку"
+                            font_style: "Body"
+                            role: "medium"
+                            bold: True
+                        Button_main:
+                            on_release: root.create_route_kart()
+                            Button_text:
+                                # text_size: self.size
+                                text: "сохранить"
+#                                halign: "center"
+#                                valign: "center"
+
+                MDBoxLayout:
+
+                    TimeBox:
+                        size_hint_x: .7
+                        orientation: "vertical"
+                        RouteTextInputMain:
+                            id: route_number_textinput
+                            text: ""
+                            mode: "outlined"
+                            multiline: False
+                            font_size: sp(40)
+                            on_text: root.search_rout_in_dict()
+
+
+                        KartaTextInputMain:
+                            id: karta_route_number_textinput
+                            text: ""
+                            mode: "outlined"
+                            multiline: False
+                            font_size: sp(40)
+                            on_text: root.search_rout_in_dict()
+
+                    TimeBox:
+                        size_hint_x: .3
+                        ToggleButton:
+                            id:sm_1
+                            text: "1"
+                            group:'smena'
+                            state:'down'
+                        ToggleButton:
+                            id:sm_2
+                            text: "2"
+                            group:'smena'
+
+
+
+        MDBoxLayout:
+            id: BOTTOM_box
+            padding: [sp(10),sp(10),sp(10),0]
+            orientation: "vertical"
+            size_hint_y: .15
+            MDBoxLayout:
+                size_hint_y: .40
+                padding:[0,0,0,sp(5)]
+                MDBoxLayout:
+                    padding:[0,0,sp(10),0]
+                    Button_main:
+                        on_release: root.intercept_data_main_screen()
+                        Button_text:
+                            text: "Сохранить"
+                MDBoxLayout:
+                    Button_main:
+                        on_release: sys.exit()
+                        Button_text:
+                            pos_hint: {"right": .7,"center_y": .5}
+                            text: "Выход"
+            MDBoxLayout:
+                size_hint:(1,.1)
+                # padding: sp(5)
+                TitleLabel:
+                    markup: True
+                    text: "автор: Погодаев Илья Сергеевич [color=#0B0080][b]ilya1880@mail.ru[/b][/color]"
+                    theme_font_size: "Custom"
+                    font_size: sp(11)
+                    halign: "center"
+                    valign: "center"
+<Page_stat>:
+    id: page_stat
+    name: "stat_page"
+    md_bg_color: app.theme_cls.primaryContainerColor # app.theme_cls.primaryColor # app.theme_cls.primaryContainerColor
+    MDBoxLayout:
+        id: root_stat_box
+        orientation: "vertical"
+        MDBoxLayout:
+            padding: [sp(10),sp(10),sp(10),0]
+            size_hint_y: .25
+            TimeSpinner:
+                id: spinner_day
+                size_hint: .25, 1
+                text: "27"# "root.day_spinner_str"
+                values: map(str,list(range(1,32)))
+                on_text: root.create_a_date_for_label()
+
+            TimeSpinner:
+                size_hint: .5, 1
+                id: spinner_month
+                font_size: 30
+                text:  "Сентябрь"# "root.month_spinner_str"
+                # values: root.spinner_month_lst
+                on_text: root.create_a_date_for_label()
+
+            TimeSpinner:
+                id: spinner_day
+                size_hint: .25, 1
+                # pos_hint: {"top":1}
+                text: "27"# "root.day_spinner_str"
+                values: map(str,list(range(1,32)))
+                on_text: root.create_a_date_for_label()
+        MDBoxLayout:
+            id: TwoBoxStat
+            size_hint: 1, 1
+            # md_bg_color: .1,1,.1
+            padding: sp(10)
+            MDCard:
+                orientation: "vertical"
+                size_hint: 1, 1
+                # elevation: 20
+                MDBoxLayout:
+                    orientation: "vertical"
+                    MDBoxLayout:
+                        MDLabel:
+                            text_size: self.size
+                            theme_font_size: "Custom"
+                            font_size: sp(20)
+                            bold:True
+                            text: spinner_month.text
+#                                valign: "center"
+#                                halign: "center"
+                    MDBoxLayout:
+                        MDLabel:
+                            id: card_label_id
+                            text_size: self.size
+                            theme_font_size: "Custom"
+                            font_size: sp(15)
+                            bold:True
+                            text:  "root.strig_statistic_for_label"
+
+
+        MDBoxLayout:
+            Button:
+                text: "Кнопка"
+        MDBoxLayout:
+            size_hint_y: .5
+
+
+<Page_setting>
+    id: page_sett
+    name: "setting_page"
+    md_bg_color: app.theme_cls.primaryContainerColor # app.theme_cls.primaryColor # app.theme_cls.primaryContainerColor
+    MDBoxLayout:
+        Button:
+            text: "setting"
+            on_release:
+                root.manager.transition = SlideTransition()
+                root.manager.transition.direction = "down"
+                root.manager.current = "main_page"
+
+
+
+
+
+#
+#                    TitleLabel:
+#                        id:label_data
+#                        text_size: self.size
+#                        valign: "bottom"
+#                        halign: "center"
+#                        size_hint:.5,1
+#                        pos_hint:{'center_x':.5,"top":1}
+#                        # text: "На дату:\n"+' '.join(root.label_month_lst)
+#                        color: 0,0,0
+#                        font_size: 30
+#        MDBoxLayout:
+#            padding:[20,0,20,0]
+#            size_hint:1,.1
+#            TitleLabel:
+#                size_hint:.8,1
+#                text: root.lab_save_txt
+#                text_size: self.size
+#                valign: "center"
+#                halign: "left"
+#                font_size: 50
+#                color: 0,0,0
+#            TitleLabel:
+#                size_hint:.2,1
+#                text_size: self.size
+#                valign: "center"
+#                halign: "center"
+#                text: root.total_hours_work
+#                font_size: 50
+#                color: 0,0,0
+#            TitleLabel:
+#                size_hint:.2,1
+#                text_size: self.size
+#                valign: "center"
+#                halign: "center"
+#                text: "Часов"
+#                font_size: 30
+#                color: 0,0,0
+#            TitleLabel:
+#                size_hint:.2,1
+#                text_size: self.size
+#                valign: "center"
+#                halign: "center"
+#                text: root.total_minutes_work
+#                font_size: 50
+#                color: 0,0,0
+#            TitleLabel:
+#                size_hint:.2,1
+#                text_size: self.size
+#                valign: "center"
+#                halign: "center"
+#                text: "Минут"
+#                font_size: 30
+#                color: 0,0,0
+#        MDBoxLayout:
+#            size_hint:1,.045
+#            padding:20
+#            Button:
+#                id: btn_save_file
+#                size_hint:1,1
+#                pos_hint:{'center_x':.5,"top":1}
+#                text: "Сохранить"
+#                font_size: 30
+#                on_press: root.validate_file_time_work()#;root.load_next()
+#            Button:
+#                size_hint:1,1
+#                pos_hint:{'center_x':.5,"top":1}
+#                text: "Выход"
+#                font_size: 30
+#                on_press: app.quit_program()
+
+#<Pages_stat>:
+#    BoxLayout:
+#        orientation: "vertical"
+#        size:root.size
+#        BoxLayout:
+#            size_hint: 1, .1
+#            Label:
+#                text: 'Отработано за период:'
+#                font_size: 50
+#                size_hint: 1, 1
+#                text_size:self.size
+#                halign:"center"
+#                color: 0,0,0
+#        BoxLayout:
+#            padding: [100,0,100,0]
+#            spacing: 20
+#            size_hint: 1, .055
+#            BoxLayout:
+#                TimeSpinner:
+#                    id: from_total_days
+#                    size_hint: .1, 1
+#                    text: root.from_total_days_spinner
+#                    values: root.list_from_total_days
+#                    on_text: root.create_choice_spinner(self)
+#
+#                TimeSpinner:
+#                    id: from_total_month
+#                    size_hint: .4, 1
+#                    text: root.total_month_spinner
+#                    values: root.spinner_month_statistic_lst
+#                    on_text: root.create_choice_spinner(self)
+#                TimeSpinner:
+#                    id: to_total_days
+#                    size_hint: .1, 1
+#                    text: root.to_total_days_spinner
+#                    values: root.list_to_total_days
+#                    on_text: root.create_choice_spinner(self)
+#        BoxLayout:
+#            size_hint: 1,.055
+#            Label:
+#                text: "Часов"
+#                text_size:self.size
+#                halign:"center"
+#                font_size: 50
+#                size_hint: 1, 1
+#                color: 0,0,0
+#            Label:
+#                text: "Минут"
+#                text_size:self.size
+#                halign:"center"
+#                font_size: 50
+#                size_hint: 1, 1
+#                color: 0,0,0
+#
+#        BoxLayout:
+#            size_hint: 1,.1
+#            Label:
+#                id: tot_hours_statistic
+#                text: root.total_hours_work_statistic
+#                text_size:self.size
+#                halign:"center"
+#                valign:"top"
+#                font_size: 50
+#                size_hint: 1, 1
+#                color: 0,0,0
+#            Label:
+#                id: tot_minutes_statistic
+#                text: root.total_minutes_work_statistic
+#                text_size:self.size
+#                halign:"center"
+#                valign:"top"
+#                font_size: 50
+#                size_hint: 1, 1
+#                color: 0,0,0
+#        BoxLayout:
+#            orientation:
+#            padding: [5,0,5,0]
+#            spacing: 10
+#            size_hint: 1,.2
+#            Button:
+#                text: "Очистить текущий месяц"
+#                size_hint: .5,.21
+#                pos_hint: {"top":1}
+#                font_size: 32
+#                text_size: self.size
+#                valign: "center"
+#            Button:
+#                text: "Очистить всю статистику"
+#                size_hint: .5,.21
+#                pos_hint: {"top":1}
+#                font_size: 32
+#                text_size: self.size
+#                valign: "center"
+
+
+

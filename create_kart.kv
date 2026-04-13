@@ -1,0 +1,283 @@
+<Create_route_kart>:
+    name: "main_create_kart"
+    md_bg_color: app.theme_cls.primaryContainerColor # app.theme_cls.primaryColor # app.theme_cls.primaryContainerColor
+    MDBoxLayout:
+        id: root_main_box
+        padding: [dp(10),0,dp(10),0]
+        spacing: dp(5)
+        orientation: "vertical"
+        size: root.size
+        MDBoxLayout:
+            size_hint_y: .042
+            TitleLabel:
+                text: "Создание маршрута"
+                role: "large"
+        MDBoxLayout:
+            spacing: dp(5)
+            size_hint_y: .1
+            MDBoxLayout:
+                RouteTextInputCreate:
+                    id: route_input
+                    parent_color: app.theme_cls.primaryContainerColor
+                    size_hint_y: 1
+                    text: ""
+                    mode: "outlined"
+                    multiline: False
+                    halign: "center"
+                    on_text: root.intercept_time()
+            MDBoxLayout:
+                KartaTextInputCreate:
+                    id:karta_input
+                    parent_color: app.theme_cls.primaryContainerColor
+                    size_hint_y: 1
+                    text: ""
+                    mode: "outlined"
+                    multiline: False
+                    halign: "center"
+                    on_text: root.intercept_time()
+        MDBoxLayout:
+            id: TOP_box
+            size_hint_y: .5
+            MDBoxLayout:
+                id:left_box
+                orientation: "vertical"
+                TimeBox:
+                    size_hint_y: .2
+                    MDBoxLayout:
+                        size_hint: 1,1
+                        TitleLabel:
+                            text: "  НАЧАЛО\n рабочего дня"
+                            color: "red"
+                    MDBoxLayout:
+                        MDBoxLayout:
+                            HoursTextInput:
+                                id: start_hour_smena_input
+                                parent_color: app.theme_cls.primaryContainerColor
+                                size_hint_y: 1
+                                mode: "outlined"
+                                multiline: False
+                                halign: "center"
+                                bold: True
+                                on_text: root.intercept_time()
+
+                        TitleLabel:
+                            size_hint: .1, 1
+                            text: ":"
+                        MDBoxLayout:
+                            MinutesTextInput:
+                                id: start_minutes_smena_input
+                                parent_color: app.theme_cls.primaryContainerColor
+                                size_hint_y: 1
+                                mode: "outlined"
+                                multiline: False
+                                halign: "center"
+                                bold: True
+                                on_text: root.intercept_time()
+
+                TimeBox:
+                    size_hint_y: .2
+                    MDBoxLayout:
+                        orientation: "vertical"
+                        #padding:[20,10,20,0]
+                        TitleLabel:
+                            text: "    установите \nНАЧАЛО перерыва"
+                    MDBoxLayout:
+                        MDBoxLayout:
+                            HoursTextInput:
+                                id: start_lunch_hours_input
+                                parent_color: app.theme_cls.primaryContainerColor
+                                size_hint_y: 1
+                                mode: "outlined"
+                                multiline: False
+                                halign: "center"
+                                bold: True
+                                on_text: root.intercept_time()
+
+                        TitleLabel:
+                            size_hint: .1, 1
+                            text: ":"
+                        MDBoxLayout:
+                            MinutesTextInput:
+                                id: start_lunch_minutes_input
+                                parent_color: app.theme_cls.primaryContainerColor
+                                size_hint_y: 1
+                                mode: "outlined"
+                                multiline: False
+                                halign: "center"
+                                bold: True
+                                on_text: root.intercept_time()
+
+            MDBoxLayout:
+                id: right_box
+                orientation: "vertical"
+                TimeBox:
+                    size_hint_y: .2
+                    # padding: 5
+                    MDBoxLayout:
+                        TitleLabel:
+                            text: "   КОНЕЦ\n    рабочего дня"
+                    MDBoxLayout:
+                        MDBoxLayout:
+                            HoursTextInput:
+                                id: end_hours_smena_input
+                                parent_color: app.theme_cls.primaryContainerColor
+                                size_hint_y: 1
+                                mode: "outlined"
+                                multiline: False
+                                halign: "center"
+                                bold: True
+                                on_text: root.intercept_time()
+
+                        TitleLabel:
+                            size_hint: .1, 1
+                            text: ":"
+                        MDBoxLayout:
+                            MinutesTextInput:
+                                id: end_minutes_smena_input
+                                parent_color: app.theme_cls.primaryContainerColor
+                                size_hint_y: 1
+                                mode: "outlined"
+                                multiline: False
+                                halign: "center"
+                                bold: True
+                                on_text: root.intercept_time()
+                TimeBox:
+                    size_hint_y: .2
+                    # padding: 5
+                    orientation: "vertical"
+                    MDBoxLayout:
+                        id: box_time_end
+                        TitleLabel:
+                            text: "установите\n  КОНЕЦ перерыва"
+                    MDBoxLayout:
+                        MDBoxLayout:
+                            HoursTextInput:
+                                id: end_lunch_hours_input
+                                parent_color: app.theme_cls.primaryContainerColor
+                                size_hint_y: 1
+                                mode: "outlined"
+                                multiline: False
+                                halign: "center"
+                                bold: True
+                                on_text: root.intercept_time()
+
+                        TitleLabel:
+                            size_hint: .1, 1
+                            text: ":"
+                        MDBoxLayout:
+                            MinutesTextInput:
+                                id: end_lunch_minutes_input
+                                parent_color: app.theme_cls.primaryContainerColor
+                                size_hint_y: 1
+                                mode: "outlined"
+                                multiline: False
+                                halign: "center"
+                                bold: True
+                                on_text: root.intercept_time()
+
+
+
+
+
+        MDBoxLayout:
+            size_hint_y: .5
+            id: BOTTOM_box
+            # : [dp(10),dp(10),dp(10),0]
+            spacing: dp(5)
+            orientation: "vertical"
+            TimeBox:
+                size_hint_y: .7
+                MDBoxLayout:
+                    size_hint_y: .2
+                    TitleLabel:
+
+                        text:f"Маршрут  [size=20sp]{root.ROUTE_STR}[/size]  Карта [size=20sp] {root.KARTA_STR}[/size]"
+                TimeBox:
+                    size_hint_y: .6
+                    orientation: "horizontal"
+                    MDBoxLayout:
+                        orientation: "vertical"
+                        size_hint_x: .3
+                        TitleLabel:
+                            text:"начало \nсмены"
+                        MDBoxLayout:
+                            TitleLabel:
+                                id: start_smena_time_label
+                                role: "large"
+                                text:"15:10"
+#                            TitleLabel:
+#                                text:"10"
+
+                    MDBoxLayout:
+                        orientation: "vertical"
+                        size_hint_x: .3
+                        TitleLabel:
+                            text:"конец \nсмены"
+                        MDBoxLayout:
+                            TitleLabel:
+                                id: end_smena_time_label
+                                role: "large"
+                                text:"01:43"
+#                            TitleLabel:
+#                                text:"43"
+
+
+
+
+
+                    MDBoxLayout:
+                        orientation: "vertical"
+                        size_hint_x: .3
+                        spacing: sp(5)
+                        TitleLabel:
+                            text:"перерыв"
+                            size_hint_y: .3
+                        MDBoxLayout:
+                            orientation: "vertical"
+                            # spacing: sp(5)
+                            TitleLabel:
+                                id: start_lunch_label
+                                role: "large"
+                                halign: "left"
+                            TitleLabel:
+                                id: end_lunch_label
+                                role: "large"
+                                halign: "right"
+
+
+
+                MDBoxLayout:
+                    size_hint_y: .2
+
+
+
+
+
+            MDBoxLayout:
+                id: Box_button
+                size_hint_y: .2
+                spacing: dp(5)
+                MDBoxLayout:
+                    Button_main:
+                        id: save_button
+                        on_release: root.intercept_data_main_screen()
+                        disabled: True
+                        md_bg_color: app.theme_cls.primaryContainerColor if self.disabled else "black"
+                        Button_text:
+                            text: "Сохранить"
+                MDBoxLayout:
+                    Button_main:
+                        on_release: sys.exit()
+                        Button_text:
+                            pos_hint: {"right": .7,"center_y": .5}
+                            text: "Выход"
+            MDBoxLayout:
+                size_hint_y:.1
+                # padding: sp(5)
+                TitleLabel:
+                    markup: True
+                    text: "автор: Погодаев Илья Сергеевич [color=#0B0080][b]ilya1880@mail.ru[/b][/color]"
+                    theme_font_size: "Custom"
+                    font_size: sp(11)
+                    halign: "center"
+                    valign: "center"
