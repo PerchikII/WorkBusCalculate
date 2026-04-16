@@ -12,6 +12,7 @@ import os
 from datetime import timedelta
 import pickle
 from pprint import pprint
+import re
 
 from sys import platform
 if platform == "win32":
@@ -27,7 +28,7 @@ from kivy.uix.screenmanager import SlideTransition
 from kivymd.uix.screen import MDScreen
 from kivymd.uix.textfield import MDTextField
 from kivymd.uix.boxlayout import MDBoxLayout
-
+from kivy.factory import Factory
 from kivy.lang.builder import Builder
 from kivy.properties import ListProperty, StringProperty
 from kivy.clock import Clock
@@ -140,7 +141,6 @@ class PagesManager(MDScreenManager):
         return super(PagesManager, self).on_touch_up(touch)
 
 
-
 def checking_the_time(hours,minutes):
     if hours.isdigit() and minutes.isdigit():
         return hours + ":" + minutes
@@ -148,13 +148,99 @@ def checking_the_time(hours,minutes):
         return "0 : 0"
 
 
+def calculate_time_more_day(time_tuple:tuple[str]):
+    day = timedelta(hours=24)
+    Hour_start_work = int(time_tuple[0])
+    Min_start_work = int(time_tuple[1])
+    Hour_end_work = int(time_tuple[2])
+    Min_end_work = int(time_tuple[3])
+
+    Hour_start_lunch = int(time_tuple[4])
+    Min_start_lunch = int(time_tuple[5])
+    Hour_end_lunch = int(time_tuple[6])
+    Min_end_lunch = int(time_tuple[7])
+
+    time_start_lunch = timedelta(hours=Hour_start_lunch, minutes=Min_start_lunch)
+    time_end_lunch = timedelta(hours=Hour_end_lunch, minutes=Min_end_lunch)
+    total_time_lunch = time_end_lunch - time_start_lunch
+
+    time_start_work = timedelta(hours=Hour_start_work, minutes=Min_start_work)
+    time_end_work = timedelta(hours=Hour_end_work, minutes=Min_end_work)
+
+    diff_hours_with_day = day - time_start_work
+    total = diff_hours_with_day + time_end_work
+    total_time_more_day_work = total - total_time_lunch
+    return total_time_more_day_work
+
+
+def calculate_time_less_day(time_args:tuple[str]):
+    Hour_start_work = int(time_args[0])
+    Hour_end_work = int(time_args[2])
+    Min_start_work = int(time_args[1])
+    Min_end_work = int(time_args[3])
+
+    Hour_start_lunch = int(time_args[4])
+    Min_start_lunch = int(time_args[5])
+    Hour_end_lunch = int(time_args[6])
+    Min_end_lunch = int(time_args[7])
+
+    time_start_lunch = timedelta(hours=Hour_start_lunch, minutes=Min_start_lunch)
+    time_end_lunch = timedelta(hours=Hour_end_lunch, minutes=Min_end_lunch)
+    total_time_lunch = time_end_lunch - time_start_lunch
+
+    time_start_work = timedelta(hours=Hour_start_work, minutes=Min_start_work)
+    time_end_work = timedelta(hours=Hour_end_work, minutes=Min_end_work)
+    total_time_less_day_work = (time_end_work - time_start_work) - total_time_lunch
+    return total_time_less_day_work
+
+
+
+
+
+
+##################################################################
+##########################################################################
+#################################################################
+class WordSave_or_Time(MDLabel):
+    def __init__(self, **kwargs):
+        super(WordSave_or_Time, self).__init__(**kwargs)
+        # self.role = "small"
+        #  self.size_hint = (1, 1)
+        self.font_style = "Title"
+        self.bold = True
+        self.text_size = self.size
+        self.halign = "center"
+        self.valign = "center"
+
+
 
 class Create_route_kart(MDScreen):
     ROUTE_STR = StringProperty(" ")
     KARTA_STR = StringProperty("")
+
     Builder.load_file(os.path.join(dir_name, "create_kart.kv"))
 
-    def intercept_time(self):
+    def __init__(self, **kwargs):
+        super(Create_route_kart, self).__init__(**kwargs)
+        self.total_time = ["10", "20"]
+        self.box_word_save = MDBoxLayout(WordSave_or_Time(text="Сохранено",
+                                                          text_color = "red",
+                                                          role = "large"))
+
+
+
+    def create_box_total_time(self):
+        self.time_and_save_box.clear_widgets()
+        box_total_time = MDBoxLayout(WordSave_or_Time(text="Отработка:", size_hint_x=.3, role="small"),
+                                          WordSave_or_Time(text=self.total_time[0], size_hint_x=.1, role="large",
+                                                           text_color="cadetblue"),
+                                          WordSave_or_Time(text="часов", size_hint_x=.2, role="small"),
+                                          WordSave_or_Time(text=self.total_time[1], size_hint_x=.1, role="large",
+                                                           text_color="red"),
+                                          WordSave_or_Time(text="минут", size_hint_x=.2, role="small"))
+        self.time_and_save_box.add_widget(box_total_time)
+
+    def collecting_route_data(self):
         route = self.ids.route_input.text
         karta = self.ids.karta_input.text
         if route.isdigit() and karta.isdigit():
@@ -178,13 +264,34 @@ class Create_route_kart(MDScreen):
         self.ids.end_smena_time_label.text = checking_the_time(end_H,end_M)
         self.ids.start_lunch_label.text = checking_the_time(start_lunch_H,start_lunch_M)
         self.ids.end_lunch_label.text = checking_the_time(end_lunch_H,end_lunch_M)
-        lst = (route,karta,start_H,start_M,end_H,end_M,start_lunch_H,start_lunch_M,end_lunch_H,end_lunch_M)
+        tuple_correct_time = (route,karta,start_H,start_M,end_H,end_M,start_lunch_H,start_lunch_M,end_lunch_H,end_lunch_M)
         try:
-            list(map(int, lst))
+            list(map(int, tuple_correct_time))
             self.ids.save_button.disabled = False
+            if int(start_H) < int(end_H):
+                tot_time = str(calculate_time_less_day(tuple_correct_time[2:]))
+            else:
+                tot_time = str(calculate_time_more_day(tuple_correct_time[2:]))
+            self.total_time = tot_time.split(":")
+            self.create_box_total_time()
+
         except ValueError:
             self.ids.save_button.disabled = True
 
+
+
+    def my_callback(self,qt):
+        time_box = Factory.TotalBox()
+        self.time_and_save_box.add_widget(time_box)
+        self.time_and_save_box.remove_widget(self.save_box)
+
+
+    def create_save_label(self):
+        Clock.schedule_once(self.my_callback,3)
+        # self.time_and_save_box.remove_widget(self.total_box)
+        self.time_and_save_box.remove_widget()
+        self.save_box = Factory.SaveBox()
+        self.time_and_save_box.add_widget(self.save_box)
 
 
 
@@ -417,51 +524,10 @@ class Page_main(MDScreen):
         month = self.ids["spinner_month"].text
         self.date_total_time = day + " " + month
 
-    @staticmethod
-    def calculate_time_more_day(time_tuple):
-        day = timedelta(hours=24)
-        Hour_start_work = int(time_tuple[0])
-        Hour_end_work = int(time_tuple[2])
-        Min_start_work = int(time_tuple[1])
-        Min_end_work = int(time_tuple[3])
 
-        Hour_start_lunch = int(time_tuple[4])
-        Min_start_lunch = int(time_tuple[5])
-        Hour_end_lunch = int(time_tuple[6])
-        Min_end_lunch = int(time_tuple[7])
 
-        time_start_lunch = timedelta(hours=Hour_start_lunch, minutes=Min_start_lunch)
-        time_end_lunch = timedelta(hours=Hour_end_lunch, minutes=Min_end_lunch)
-        total_time_lunch = time_end_lunch - time_start_lunch
 
-        time_start_work = timedelta(hours=Hour_start_work, minutes=Min_start_work)
-        time_end_work = timedelta(hours=Hour_end_work, minutes=Min_end_work)
 
-        diff_hours_with_day = day - time_start_work
-        total = diff_hours_with_day + time_end_work
-        total_time_more_day_work = total - total_time_lunch
-        return total_time_more_day_work
-
-    @staticmethod
-    def calculate_time_less_day(time_args):
-        Hour_start_work = int(time_args[0])
-        Hour_end_work = int(time_args[2])
-        Min_start_work = int(time_args[1])
-        Min_end_work = int(time_args[3])
-
-        Hour_start_lunch = int(time_args[4])
-        Min_start_lunch = int(time_args[5])
-        Hour_end_lunch = int(time_args[6])
-        Min_end_lunch = int(time_args[7])
-
-        time_start_lunch = timedelta(hours=Hour_start_lunch, minutes=Min_start_lunch)
-        time_end_lunch = timedelta(hours=Hour_end_lunch, minutes=Min_end_lunch)
-        total_time_lunch = time_end_lunch - time_start_lunch
-
-        time_start_work = timedelta(hours=Hour_start_work, minutes=Min_start_work)
-        time_end_work = timedelta(hours=Hour_end_work, minutes=Min_end_work)
-        total_time_less_day_work = (time_end_work - time_start_work) - total_time_lunch
-        return total_time_less_day_work
 
     def my_callback(self, instance):
         self.ids["savingtext"].text_color = "black"
@@ -746,26 +812,31 @@ class KartaTextInputCreate(MDTextField):
 class HoursTextInput(MDTextField):
     def __init__(self, **kwargs):
         super(HoursTextInput, self).__init__(**kwargs)
+        self.temp_lst = ["", ""]
+
+    def do_backspace(self, from_undo=False, mode='bkspc'):
+        self.text = ""
+        self.temp_lst = ["", ""]
+
     def insert_text(self, value, from_undo=False):
         if value.isdigit():
-            if len(self.text) < 2:
-                return super().insert_text(value, from_undo=from_undo)
-
-            #
-            # if val < 3:
-            #     if len(self.text) < 2:
-            #         # val+=value
-            #         try:
-            #             if int(val) < 24:
-            #                 return super().insert_text(value, from_undo=from_undo)
-            #         except ValueError:
-            #             pass
-
-
-                    # return super().insert_text(value, from_undo=from_undo)
-
-
-
+            if not self.temp_lst[0]:
+                self.temp_lst[0]= value
+                if int(value) < 3:
+                    if len(self.text) < 2:
+                        return super().insert_text(value, from_undo=from_undo)
+                else:
+                    self.temp_lst = ["", ""]
+            else:
+                self.temp_lst[1] = value
+                if self.temp_lst[0] == "2":
+                    if int(value) < 4:
+                        if len(self.text) < 2:
+                            self.temp_lst = ["", ""]
+                            return super().insert_text(value, from_undo=from_undo)
+                else:
+                    if len(self.text) < 2:
+                        return super().insert_text(value, from_undo=from_undo)
     def on_focus(self, inst, args):
         if args:
             self.parent.md_bg_color = "greenyellow"
@@ -776,13 +847,32 @@ class HoursTextInput(MDTextField):
                 self.parent.md_bg_color = self.parent_color
                 self.font_size = "20dp"
                 self.text = "Час"
+
+
+
 class MinutesTextInput(MDTextField):
     def __init__(self, **kwargs):
         super(MinutesTextInput, self).__init__(**kwargs)
+        self.temp_lst = ["", ""]
+
+    def do_backspace(self, from_undo=False, mode='bkspc'):
+        self.text = ""
+        self.temp_lst = ["", ""]
+
     def insert_text(self, value, from_undo=False):
         if value.isdigit():
-            if len(self.text) < 2:
-                return super().insert_text(value, from_undo=from_undo)
+            if not self.temp_lst[0]:
+                self.temp_lst[0] = value
+                if int(value) < 6:
+                    if len(self.text) < 2:
+                        return super().insert_text(value, from_undo=from_undo)
+                else:
+                    self.temp_lst = ["", ""]
+            else:
+                self.temp_lst[1] = value
+                if len(self.text) < 2:
+                    self.temp_lst = ["", ""]
+                    return super().insert_text(value, from_undo=from_undo)
 
     def on_focus(self, inst, args):
         if args:

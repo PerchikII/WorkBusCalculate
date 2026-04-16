@@ -1,6 +1,37 @@
+<SaveBox@MDBoxLayout>
+    # id: save_box
+    TitleLabel:
+        text: "Сохранено"
+        role: "large"
+        color: 1,0,0
+
+
+<TotalBox@MDBoxLayout>
+    TitleLabel:
+        text: "отработка: "
+        size_hint_x: .3
+    TitleLabel:
+        text: "total_time"
+        role: "large"
+        size_hint_x: .1
+    TitleLabel
+        text: "часов"
+        size_hint_x: .2
+    TitleLabel:
+        text: "total_time"
+        role: "large"
+        size_hint_x: .1
+    TitleLabel
+        text: "минут"
+        size_hint_x: .2
+
 <Create_route_kart>:
     name: "main_create_kart"
     md_bg_color: app.theme_cls.primaryContainerColor # app.theme_cls.primaryColor # app.theme_cls.primaryContainerColor
+
+    time_and_save_box: time_and_save_box
+    # total_box: total_box
+
     MDBoxLayout:
         id: root_main_box
         padding: [dp(10),0,dp(10),0]
@@ -24,7 +55,7 @@
                     mode: "outlined"
                     multiline: False
                     halign: "center"
-                    on_text: root.intercept_time()
+                    on_text: root.collecting_route_data()
             MDBoxLayout:
                 KartaTextInputCreate:
                     id:karta_input
@@ -34,7 +65,7 @@
                     mode: "outlined"
                     multiline: False
                     halign: "center"
-                    on_text: root.intercept_time()
+                    on_text: root.collecting_route_data()
         MDBoxLayout:
             id: TOP_box
             size_hint_y: .5
@@ -46,8 +77,8 @@
                     MDBoxLayout:
                         size_hint: 1,1
                         TitleLabel:
-                            text: "  НАЧАЛО\n рабочего дня"
-                            color: "red"
+                            text: "  [color=#4682B4]НАЧАЛО[/color]\n рабочего дня"
+
                     MDBoxLayout:
                         MDBoxLayout:
                             HoursTextInput:
@@ -58,7 +89,7 @@
                                 multiline: False
                                 halign: "center"
                                 bold: True
-                                on_text: root.intercept_time()
+                                on_text: root.collecting_route_data()
 
                         TitleLabel:
                             size_hint: .1, 1
@@ -72,7 +103,7 @@
                                 multiline: False
                                 halign: "center"
                                 bold: True
-                                on_text: root.intercept_time()
+                                on_text: root.collecting_route_data()
 
                 TimeBox:
                     size_hint_y: .2
@@ -80,7 +111,7 @@
                         orientation: "vertical"
                         #padding:[20,10,20,0]
                         TitleLabel:
-                            text: "    установите \nНАЧАЛО перерыва"
+                            text: "    установите \n[color=#4682B4]НАЧАЛО перерыва[/color]"
                     MDBoxLayout:
                         MDBoxLayout:
                             HoursTextInput:
@@ -91,7 +122,7 @@
                                 multiline: False
                                 halign: "center"
                                 bold: True
-                                on_text: root.intercept_time()
+                                on_text: root.collecting_route_data()
 
                         TitleLabel:
                             size_hint: .1, 1
@@ -105,7 +136,7 @@
                                 multiline: False
                                 halign: "center"
                                 bold: True
-                                on_text: root.intercept_time()
+                                on_text: root.collecting_route_data()
 
             MDBoxLayout:
                 id: right_box
@@ -115,7 +146,7 @@
                     # padding: 5
                     MDBoxLayout:
                         TitleLabel:
-                            text: "   КОНЕЦ\n    рабочего дня"
+                            text: "   [color=#4682B4]КОНЕЦ[/color]\n    рабочего дня"
                     MDBoxLayout:
                         MDBoxLayout:
                             HoursTextInput:
@@ -126,7 +157,7 @@
                                 multiline: False
                                 halign: "center"
                                 bold: True
-                                on_text: root.intercept_time()
+                                on_text: root.collecting_route_data()
 
                         TitleLabel:
                             size_hint: .1, 1
@@ -140,7 +171,7 @@
                                 multiline: False
                                 halign: "center"
                                 bold: True
-                                on_text: root.intercept_time()
+                                on_text: root.collecting_route_data()
                 TimeBox:
                     size_hint_y: .2
                     # padding: 5
@@ -148,7 +179,7 @@
                     MDBoxLayout:
                         id: box_time_end
                         TitleLabel:
-                            text: "установите\n  КОНЕЦ перерыва"
+                            text: "установите\n  [color=#4682B4]КОНЕЦ перерыва[/color]"
                     MDBoxLayout:
                         MDBoxLayout:
                             HoursTextInput:
@@ -159,7 +190,7 @@
                                 multiline: False
                                 halign: "center"
                                 bold: True
-                                on_text: root.intercept_time()
+                                on_text: root.collecting_route_data()
 
                         TitleLabel:
                             size_hint: .1, 1
@@ -173,7 +204,7 @@
                                 multiline: False
                                 halign: "center"
                                 bold: True
-                                on_text: root.intercept_time()
+                                on_text: root.collecting_route_data()
 
 
 
@@ -190,21 +221,19 @@
                 MDBoxLayout:
                     size_hint_y: .2
                     TitleLabel:
-
-                        text:f"Маршрут  [size=20sp]{root.ROUTE_STR}[/size]  Карта [size=20sp] {root.KARTA_STR}[/size]"
+                        text:f"Маршрут  [color=#eb34b7][size=20sp]{root.ROUTE_STR}[/size][/color]  Карта [color=#eb34b7][size=20sp] {root.KARTA_STR}[/size][/color]"
                 TimeBox:
                     size_hint_y: .6
                     orientation: "horizontal"
                     MDBoxLayout:
                         orientation: "vertical"
-                        size_hint_x: .3
+                        size_hint_x: .2
                         TitleLabel:
                             text:"начало \nсмены"
                         MDBoxLayout:
                             TitleLabel:
                                 id: start_smena_time_label
                                 role: "large"
-                                text:"15:10"
 #                            TitleLabel:
 #                                text:"10"
 
@@ -217,13 +246,6 @@
                             TitleLabel:
                                 id: end_smena_time_label
                                 role: "large"
-                                text:"01:43"
-#                            TitleLabel:
-#                                text:"43"
-
-
-
-
 
                     MDBoxLayout:
                         orientation: "vertical"
@@ -234,7 +256,6 @@
                             size_hint_y: .3
                         MDBoxLayout:
                             orientation: "vertical"
-                            # spacing: sp(5)
                             TitleLabel:
                                 id: start_lunch_label
                                 role: "large"
@@ -246,8 +267,18 @@
 
 
 
+
+
+
+
                 MDBoxLayout:
+                    id: time_and_save_box
                     size_hint_y: .2
+
+
+
+
+
 
 
 
@@ -260,17 +291,18 @@
                 MDBoxLayout:
                     Button_main:
                         id: save_button
-                        on_release: root.intercept_data_main_screen()
+                        on_release: root.intercept_data_time_route()
                         disabled: True
                         md_bg_color: app.theme_cls.primaryContainerColor if self.disabled else "black"
                         Button_text:
                             text: "Сохранить"
                 MDBoxLayout:
                     Button_main:
-                        on_release: sys.exit()
+                        on_release: root.create_save_label()
                         Button_text:
                             pos_hint: {"right": .7,"center_y": .5}
-                            text: "Выход"
+                            text: "Назад"
+
             MDBoxLayout:
                 size_hint_y:.1
                 # padding: sp(5)
