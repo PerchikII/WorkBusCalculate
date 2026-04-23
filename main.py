@@ -34,13 +34,19 @@ from kivy.properties import ListProperty, StringProperty
 from kivy.clock import Clock
 from kivy.core.window import Window
 
+# os.path.join(dir_name,FILE_STATISTIC_NAME
+
+
+WORK_TIME_FILE = "worktime_data.dat"
+ROUTE_FILE_SM_1 = "route_sm_1.dat"
+ROUTE_FILE_SM_2 = "route_sm_2.dat"
 
 """Директория main.py"""
 dir_name = os.getcwd()
 
 def load_HDDfile_time():
     try:
-        with open("worktime_data.dat", 'rb') as file:
+        with open(os.path.join(dir_name,WORK_TIME_FILE), 'rb') as file:
             file_dict = pickle.load(file)
             print("Успешно открыт worktime_data.dat")
             return file_dict
@@ -55,46 +61,36 @@ def load_HDDfile_time():
 
 def load_HDDfile_route(sm):
     if sm == 1:
-        try:
-            with open("route_sm_1.dat", 'rb') as file:
-                file_dict = pickle.load(file)
-                print("Успешно открыт route_sm_1.dat")
-                return file_dict
-        except (FileNotFoundError, IOError, EOFError):
-            # Код одноразовый для первого запуска программы
-            print("Не открылся route_sm_1.dat. Создался пустой")
-            with open(os.path.join(dir_name, "route_sm_1.dat"), 'wb') as obj:
-                file_dict = {}
-                pickle.dump(file_dict, obj)
-        return file_dict
-    if sm == 2:
-        try:
-            with open("route_sm_2.dat", 'rb') as file:
-                file_dict = pickle.load(file)
-                print("Успешно открыт route_sm_2.dat")
-                return file_dict
-        except (FileNotFoundError, IOError, EOFError):
-            # Код одноразовый для первого запуска программы
-            print("Не открылся route_sm_2.dat. Создался пустой")
-            with open(os.path.join(dir_name, "route_sm_2.dat"), 'wb') as obj:
-                file_dict = {}
-                pickle.dump(file_dict, obj)
-        return file_dict
+        open_file = ROUTE_FILE_SM_1
+    elif sm == 2:
+        open_file = ROUTE_FILE_SM_2
+    try:
+        with open(os.path.join(dir_name,open_file), 'rb') as file:
+            file_dict = pickle.load(file)
+            print("Успешно открыт: ",open_file)
+            return file_dict
+    except (FileNotFoundError, IOError, EOFError):
+        # Код одноразовый для первого запуска программы
+        print("Не открылся: ",open_file," Создался пустой")
+        with open(os.path.join(dir_name, open_file), 'wb') as obj:
+            file_dict = {}
+            pickle.dump(file_dict, obj)
+            return file_dict
 
-
-
-def save_HDD_DICT_TIME(dictionary, name_file):
-    with open(name_file, 'wb') as file:
+def save_HDD_DICT(dictionary:dict, name_file:str):
+    with open(os.path.join(dir_name,name_file), 'wb') as file:
         pickle.dump(dictionary, file)
 
 
 DICT_TIME_STATISTIC = load_HDDfile_time()
 # DICT_TIME_STATISTIC = {}
-
 DICT_ROUT_1 = load_HDDfile_route(1)
 # DICT_ROUT = {}
 DICT_ROUT_2 = load_HDDfile_route(2)
-
+pprint(DICT_ROUT_1)
+print("#########################################")
+pprint(DICT_ROUT_2)
+print("+++++++++++++++++++++++++++++++++")
 month_lst = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
              'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь']
 
@@ -140,45 +136,17 @@ class PagesManager(MDScreenManager):
                 self.current = "setting_page"
         return super(PagesManager, self).on_touch_up(touch)
 
-
 def checking_the_time(hours,minutes):
     if hours.isdigit() and minutes.isdigit():
         return hours + ":" + minutes
     else:
-        return "0 : 0"
+        return "00 : 00"
 
-
-def calculate_time_more_day(time_tuple:tuple[str]):
-    day = timedelta(hours=24)
-    Hour_start_work = int(time_tuple[0])
-    Min_start_work = int(time_tuple[1])
-    Hour_end_work = int(time_tuple[2])
-    Min_end_work = int(time_tuple[3])
-
-    Hour_start_lunch = int(time_tuple[4])
-    Min_start_lunch = int(time_tuple[5])
-    Hour_end_lunch = int(time_tuple[6])
-    Min_end_lunch = int(time_tuple[7])
-
-    time_start_lunch = timedelta(hours=Hour_start_lunch, minutes=Min_start_lunch)
-    time_end_lunch = timedelta(hours=Hour_end_lunch, minutes=Min_end_lunch)
-    total_time_lunch = time_end_lunch - time_start_lunch
-
-    time_start_work = timedelta(hours=Hour_start_work, minutes=Min_start_work)
-    time_end_work = timedelta(hours=Hour_end_work, minutes=Min_end_work)
-
-    diff_hours_with_day = day - time_start_work
-    total = diff_hours_with_day + time_end_work
-    total_time_more_day_work = total - total_time_lunch
-    return total_time_more_day_work
-
-
-def calculate_time_less_day(time_args:tuple[str]):
+def calculate_work_time(time_args:tuple[str,str,str,str,str,str,str,str])->str :
     Hour_start_work = int(time_args[0])
     Hour_end_work = int(time_args[2])
     Min_start_work = int(time_args[1])
     Min_end_work = int(time_args[3])
-
     Hour_start_lunch = int(time_args[4])
     Min_start_lunch = int(time_args[5])
     Hour_end_lunch = int(time_args[6])
@@ -186,12 +154,29 @@ def calculate_time_less_day(time_args:tuple[str]):
 
     time_start_lunch = timedelta(hours=Hour_start_lunch, minutes=Min_start_lunch)
     time_end_lunch = timedelta(hours=Hour_end_lunch, minutes=Min_end_lunch)
-    total_time_lunch = time_end_lunch - time_start_lunch
-
+    difference_time_lunch = time_end_lunch - time_start_lunch
     time_start_work = timedelta(hours=Hour_start_work, minutes=Min_start_work)
     time_end_work = timedelta(hours=Hour_end_work, minutes=Min_end_work)
-    total_time_less_day_work = (time_end_work - time_start_work) - total_time_lunch
-    return total_time_less_day_work
+
+    time_work_str = str((time_end_work - time_start_work) - difference_time_lunch)
+    total_time_work = time_work_str.split()[-1]
+    return total_time_work
+
+def get_route_and_karta(route,karta):
+    return route + "/" + karta
+
+def check_value_numeric(value:tuple)->bool:
+    try:
+        list(map(int,value))
+        return True
+    except (ValueError,TypeError):
+        return False
+def check_smena(start_time):
+    if int(start_time) < 12:
+        return DICT_ROUT_1,ROUTE_FILE_SM_1
+    else:
+        return DICT_ROUT_2,ROUTE_FILE_SM_2
+
 
 
 
@@ -215,83 +200,126 @@ class WordSave_or_Time(MDLabel):
 
 
 class Create_route_kart(MDScreen):
-    ROUTE_STR = StringProperty(" ")
-    KARTA_STR = StringProperty("")
-
     Builder.load_file(os.path.join(dir_name, "create_kart.kv"))
-
+    ROUTE_STR = StringProperty("")
+    KARTA_STR = StringProperty("")
     def __init__(self, **kwargs):
         super(Create_route_kart, self).__init__(**kwargs)
-        self.total_time = ["10", "20"]
+        self.total_time = ""
         self.box_word_save = MDBoxLayout(WordSave_or_Time(text="Сохранено",
                                                           text_color = "red",
                                                           role = "large"))
 
-
-
     def create_box_total_time(self):
+        tot_time = self.total_time.split(":")
         self.time_and_save_box.clear_widgets()
         box_total_time = MDBoxLayout(WordSave_or_Time(text="Отработка:", size_hint_x=.3, role="small"),
-                                          WordSave_or_Time(text=self.total_time[0], size_hint_x=.1, role="large",
-                                                           text_color="cadetblue"),
+                                          WordSave_or_Time(text=tot_time[0], size_hint_x=.1, role="large",
+                                                           text_color="red"),
                                           WordSave_or_Time(text="часов", size_hint_x=.2, role="small"),
-                                          WordSave_or_Time(text=self.total_time[1], size_hint_x=.1, role="large",
+                                          WordSave_or_Time(text=tot_time[1], size_hint_x=.1, role="large",
                                                            text_color="red"),
                                           WordSave_or_Time(text="минут", size_hint_x=.2, role="small"))
         self.time_and_save_box.add_widget(box_total_time)
 
+
+
+
+    def get_all_time_textinput(self)->list:
+        all_time_textinput_list = [""] * 8
+
+        all_time_textinput_list[0] = self.ids.start_hour_smena_input.text
+        all_time_textinput_list[1] = self.ids.start_minutes_smena_input.text
+
+        all_time_textinput_list[2] = self.ids.end_hours_smena_input.text
+        all_time_textinput_list[3] = self.ids.end_minutes_smena_input.text
+
+        all_time_textinput_list[4] = self.ids.start_lunch_hours_input.text
+        all_time_textinput_list[5] = self.ids.start_lunch_minutes_input.text
+
+        all_time_textinput_list[6] = self.ids.end_lunch_hours_input.text
+        all_time_textinput_list[7] = self.ids.end_lunch_minutes_input.text
+        return all_time_textinput_list
+
+
     def collecting_route_data(self):
         route = self.ids.route_input.text
         karta = self.ids.karta_input.text
-        if route.isdigit() and karta.isdigit():
+
+        if check_value_numeric((route,karta)):
             self.ROUTE_STR = route
             self.KARTA_STR = karta
-        else:
-            self.ROUTE_STR = " "
-            self.KARTA_STR = ""
 
-        start_H = self.ids.start_hour_smena_input.text
-        start_M = self.ids.start_minutes_smena_input.text
-        end_H = self.ids.end_hours_smena_input.text
-        end_M = self.ids.end_minutes_smena_input.text
 
-        start_lunch_H = self.ids.start_lunch_hours_input.text
-        start_lunch_M = self.ids.start_lunch_minutes_input.text
-        end_lunch_H = self.ids.end_lunch_hours_input.text
-        end_lunch_M = self.ids.end_lunch_minutes_input.text
 
-        self.ids.start_smena_time_label.text = checking_the_time(start_H,start_M)
-        self.ids.end_smena_time_label.text = checking_the_time(end_H,end_M)
-        self.ids.start_lunch_label.text = checking_the_time(start_lunch_H,start_lunch_M)
-        self.ids.end_lunch_label.text = checking_the_time(end_lunch_H,end_lunch_M)
-        tuple_correct_time = (route,karta,start_H,start_M,end_H,end_M,start_lunch_H,start_lunch_M,end_lunch_H,end_lunch_M)
-        try:
-            list(map(int, tuple_correct_time))
-            self.ids.save_button.disabled = False
-            if int(start_H) < int(end_H):
-                tot_time = str(calculate_time_less_day(tuple_correct_time[2:]))
-            else:
-                tot_time = str(calculate_time_more_day(tuple_correct_time[2:]))
-            self.total_time = tot_time.split(":")
+        all_time:list = self.get_all_time_textinput() # Получение всех TextInput
+
+        self.ids.start_smena_time_label.text = checking_the_time(all_time[0],all_time[1])
+        self.ids.end_smena_time_label.text = checking_the_time(all_time[2],all_time[3])
+        self.ids.start_lunch_label.text = checking_the_time(all_time[4],all_time[5])
+        self.ids.end_lunch_label.text = checking_the_time(all_time[6],all_time[7])
+        tuple_correct_time = (route,
+                              karta,
+                              all_time[0],all_time[1],all_time[2],all_time[3],
+                              all_time[4],all_time[5],all_time[6],all_time[7])
+
+        if check_value_numeric(tuple_correct_time):
+            self.total_time: str = calculate_work_time(tuple_correct_time[2:])
             self.create_box_total_time()
-
-        except ValueError:
+            self.ids.save_button.disabled = False
+        else:
             self.ids.save_button.disabled = True
+
+    def intercept_and_save_data(self):
+        all_time: list = self.get_all_time_textinput()
+        dict_and_file_for_record:tuple[dict,str] = check_smena(all_time[0])
+        DICT = dict_and_file_for_record[0]
+        FILE = dict_and_file_for_record[1]
+        route = self.ids.route_input.text
+        karta = self.ids.karta_input.text
+        KEY = get_route_and_karta(route,karta)
+        print(KEY)
+        if KEY not in DICT:
+            DICT[KEY] = all_time
+            save_HDD_DICT(DICT, FILE)
+            self.change_word_save()
+        else:
+            print("Popup")
+            MyPopup_save_route(DICT,KEY,all_time).open()
+
 
 
 
     def my_callback(self,qt):
-        time_box = Factory.TotalBox()
-        self.time_and_save_box.add_widget(time_box)
-        self.time_and_save_box.remove_widget(self.save_box)
+        self.time_and_save_box.clear_widgets()
+        self.create_box_total_time()
+
+    def change_word_save(self):
+        Clock.schedule_once(self.my_callback, 2)
+        self.time_and_save_box.clear_widgets()
+        self.time_and_save_box.add_widget(self.box_word_save)
+
+class MyPopup_save_route(Popup):
+    route_str = StringProperty()
+    karta_str = StringProperty()
 
 
-    def create_save_label(self):
-        Clock.schedule_once(self.my_callback,3)
-        # self.time_and_save_box.remove_widget(self.total_box)
-        self.time_and_save_box.remove_widget()
-        self.save_box = Factory.SaveBox()
-        self.time_and_save_box.add_widget(self.save_box)
+
+    Builder.load_file(os.path.join(dir_name, "Popup_new_route.kv"))
+    def __init__(self,dct,key,arr_time, **kwargs):
+        Popup.__init__(self, **kwargs)
+        self.dct = dct
+        self.key = key
+        self.arr_time = arr_time
+        self.route_str,self.karta_str = key.split("/")
+
+
+
+
+
+
+
+
 
 
 
@@ -757,11 +785,6 @@ class KartaTextInputMain(MDTextField):
                 self.font_size = "20dp"
                 self.text = "Карта"
 
-
-
-
-
-
 class RouteTextInputCreate(MDTextField):
     def __init__(self, **kwargs):
         MDTextField.__init__(self, **kwargs)
@@ -780,11 +803,6 @@ class RouteTextInputCreate(MDTextField):
                 self.parent.md_bg_color = self.parent_color
                 self.font_size = "20dp"
                 self.text = "Маршрут"
-
-
-
-
-
 
 
 
@@ -839,11 +857,13 @@ class HoursTextInput(MDTextField):
                         return super().insert_text(value, from_undo=from_undo)
     def on_focus(self, inst, args):
         if args:
+            self.temp_lst = ["", ""]
             self.parent.md_bg_color = "greenyellow"
             self.text = ""
             self.font_size = "30dp"
         else:
             if not self.text:
+                # self.temp_lst = ["", ""]
                 self.parent.md_bg_color = self.parent_color
                 self.font_size = "20dp"
                 self.text = "Час"
@@ -876,6 +896,7 @@ class MinutesTextInput(MDTextField):
 
     def on_focus(self, inst, args):
         if args:
+            self.temp_lst = ["", ""]
             self.parent.md_bg_color = "greenyellow"
             self.text = ""
             self.font_size = "30dp"
@@ -896,16 +917,7 @@ class MinutesTextInput(MDTextField):
 
 
 
-class MyPopup_save_route(Popup):
-    message_info = StringProperty("Такой маршрут существует.\n Переписать?")
-    Builder.load_file(os.path.join(dir_name, "Popup_new_route.kv"))
 
-    def __init__(self, date, work_time, lab, **kwargs):
-        Popup.__init__(self, **kwargs)
-        self.key = date
-        self.work_time = work_time
-        self.label = lab
-        self.open()
 
 class MyPopup_save_worktime(Popup):
     message_info = StringProperty("Рабочий день на эту дату существует.\n Переписать?")
@@ -948,8 +960,11 @@ class Screen_main(MDScreen):
         self.ids.show_karta_btn_color.md_bg_color = 1,.1,.1,.7
         self.ids.show_karta_btn_text.text = "Такой карты нет"
 
-
-
+    def find_a_karta(self):
+        pprint(DICT_ROUT_1)
+        print("##################################")
+        pprint(DICT_ROUT_2)
+        print("+++++++++++++++++++++++++++++++++")
 
 
 

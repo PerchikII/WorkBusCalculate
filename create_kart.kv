@@ -1,3 +1,7 @@
+#:kivy 2.0.1
+#: import SlideTransition kivy.uix.screenmanager.SlideTransition
+
+
 <SaveBox@MDBoxLayout>
     # id: save_box
     TitleLabel:
@@ -28,10 +32,7 @@
 <Create_route_kart>:
     name: "main_create_kart"
     md_bg_color: app.theme_cls.primaryContainerColor # app.theme_cls.primaryColor # app.theme_cls.primaryContainerColor
-
     time_and_save_box: time_and_save_box
-    # total_box: total_box
-
     MDBoxLayout:
         id: root_main_box
         padding: [dp(10),0,dp(10),0]
@@ -51,7 +52,7 @@
                     id: route_input
                     parent_color: app.theme_cls.primaryContainerColor
                     size_hint_y: 1
-                    text: ""
+                    text: "22"
                     mode: "outlined"
                     multiline: False
                     halign: "center"
@@ -61,7 +62,7 @@
                     id:karta_input
                     parent_color: app.theme_cls.primaryContainerColor
                     size_hint_y: 1
-                    text: ""
+                    text: "1"
                     mode: "outlined"
                     multiline: False
                     halign: "center"
@@ -264,26 +265,9 @@
                                 id: end_lunch_label
                                 role: "large"
                                 halign: "right"
-
-
-
-
-
-
-
                 MDBoxLayout:
                     id: time_and_save_box
                     size_hint_y: .2
-
-
-
-
-
-
-
-
-
-
             MDBoxLayout:
                 id: Box_button
                 size_hint_y: .2
@@ -291,14 +275,18 @@
                 MDBoxLayout:
                     Button_main:
                         id: save_button
-                        on_release: root.intercept_data_time_route()
+                        on_release: root.intercept_and_save_data()
                         disabled: True
                         md_bg_color: app.theme_cls.primaryContainerColor if self.disabled else "black"
                         Button_text:
                             text: "Сохранить"
                 MDBoxLayout:
                     Button_main:
-                        on_release: root.create_save_label()
+                        on_release:
+                            root.manager.transition = SlideTransition()
+                            root.manager.current = "main_screen"
+                            root.manager.transition.direction = "right"
+
                         Button_text:
                             pos_hint: {"right": .7,"center_y": .5}
                             text: "Назад"

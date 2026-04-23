@@ -2,19 +2,69 @@
     size_hint: (.9,.5)
     pos_hint: {"x_center": 1,"y": .5}
     title: "Внимание!"
+    halign: "center"
+    title_size: sp(20)
+    title_align: "center"
+    separator_color: "red"
     MDBoxLayout:
         orientation: "vertical"
-        TitleLabel:
-            text: root.message_info
-            size_hint: 1, .5
-            halign: "center"
-            color: 1,1,1
         MDBoxLayout:
+            size_hint_y: .2
+            TitleLabel:
+                text: f"Маршрут  [size=20sp][color=#B22222]{root.route_str}[/color][/size]  карта [size=20sp][color=#B22222]{root.karta_str}[/color][/size] существует."
+                halign: "center"
+                color: 1,1,1
+        MDGridLayout:
+            size_hint_y: .2
+            rows:2
+            cols:2
+            TitleLabel:
+                text: "Начало смены"
+                color: 1,1,0
+            TitleLabel:
+                text: "Конец смены"
+                color: 1,1,0
+            TitleLabel:
+                text: "05:00"
+                color: 1,1,1
+            TitleLabel:
+                text: "15:00"
+                color: 1,1,1
+        MDBoxLayout:
+            size_hint_y: .1
+            TitleLabel:
+                text: "Перерыв"
+                color: 1,1,0
+        MDGridLayout:
+            size_hint_y: .2
+            rows: 1
+            cols: 3
+            TitleLabel:
+                text: "09:00"
+                color: 1,1,1
+                halign: "right"
+            TitleLabel:
+                size_hint_x: .1
+                text: "-"
+                color: 1,1,1
+            TitleLabel:
+                text: "10:30"
+                color: 1,1,1
+                halign: "left"
+        MDBoxLayout:
+            size_hint_y: .1
+            TitleLabel:
+                text: "Заменить?"
+                color: 1,1,1
+
+        MDBoxLayout:
+            size_hint_y: .2
+            spacing: dp(10)
             Button_main:
                 on_release: root.answer_ok()
                 Button_text:
                     pos_hint: {"center_x": .5,"center_y": .5}
-                    text: "Переписать"
+                    text: "Сохранить"
             Button_main:
                 on_release: root.dismiss()
                 Button_text:
