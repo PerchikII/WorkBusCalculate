@@ -1,34 +1,6 @@
 #:kivy 2.0.1
 #: import SlideTransition kivy.uix.screenmanager.SlideTransition
 
-
-<SaveBox@MDBoxLayout>
-    # id: save_box
-    TitleLabel:
-        text: "Сохранено"
-        role: "large"
-        color: 1,0,0
-
-
-<TotalBox@MDBoxLayout>
-    TitleLabel:
-        text: "отработка: "
-        size_hint_x: .3
-    TitleLabel:
-        text: "total_time"
-        role: "large"
-        size_hint_x: .1
-    TitleLabel
-        text: "часов"
-        size_hint_x: .2
-    TitleLabel:
-        text: "total_time"
-        role: "large"
-        size_hint_x: .1
-    TitleLabel
-        text: "минут"
-        size_hint_x: .2
-
 <Create_route_kart>:
     name: "main_create_kart"
     md_bg_color: app.theme_cls.primaryContainerColor # app.theme_cls.primaryColor # app.theme_cls.primaryContainerColor
@@ -48,21 +20,20 @@
             spacing: dp(5)
             size_hint_y: .1
             MDBoxLayout:
-                RouteTextInputCreate:
+                RouteTextInput:
                     id: route_input
                     parent_color: app.theme_cls.primaryContainerColor
                     size_hint_y: 1
-                    text: "22"
                     mode: "outlined"
                     multiline: False
                     halign: "center"
                     on_text: root.collecting_route_data()
+
             MDBoxLayout:
-                KartaTextInputCreate:
+                KartaTextInput:
                     id:karta_input
                     parent_color: app.theme_cls.primaryContainerColor
                     size_hint_y: 1
-                    text: "1"
                     mode: "outlined"
                     multiline: False
                     halign: "center"
@@ -222,7 +193,7 @@
                 MDBoxLayout:
                     size_hint_y: .2
                     TitleLabel:
-                        text:f"Маршрут  [color=#eb34b7][size=20sp]{root.ROUTE_STR}[/size][/color]  Карта [color=#eb34b7][size=20sp] {root.KARTA_STR}[/size][/color]"
+                        text:f"Маршрут  [color=#eb34b7][size=20sp]{root.ROUTE_STR}[/size][/color]  карта[color=#eb34b7][size=20sp] {root.KARTA_STR}[/size][/color]"
                 TimeBox:
                     size_hint_y: .6
                     orientation: "horizontal"

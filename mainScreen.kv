@@ -20,16 +20,63 @@
                     root.manager.transition.direction = "left"
                 Button_text:
                     pos_hint: {"center_x": .5,"center_y": .5}
-                    text: "Создать карту"
+                    text: "Создать маршрут"
+#        MDBoxLayout:
+#            # md_bg_color:  "blue"
+#            orientation: "vertical"
+#            size_hint_y: .2
+#            Button_main:
+#                on_release: root.find_a_karta()
+#                Button_text:
+#                    pos_hint: {"center_x": .5,"center_y": .5}
+#                    text: "Найти маршрут"
         MDBoxLayout:
-            # md_bg_color:  "blue"
+            canvas.before:
+                Color:
+                    rgba: .1,0,0,1
+                Line:
+                    width: 2
+                    rectangle: self.x,self.y,self.width,self.height
+            padding: dp(5)
+            # md_bg_color:  "red"
             orientation: "vertical"
-            size_hint_y: .2
-            Button_main:
-                on_release: root.find_a_karta()
-                Button_text:
-                    pos_hint: {"center_x": .5,"center_y": .5}
-                    text: "Найти карту"
+            size_hint_y: .5
+            MDBoxLayout:
+                size_hint_y: .4
+                Button_main:
+                    on_release: root.find_a_karta()
+                    Button_text:
+                        text: "Найти маршрут"
+                        pos_hint: {"center_x": .5,"center_y": .5}
+            MDBoxLayout:
+                size_hint_y: .2
+                TitleLabel:
+                    id: title_show_route
+                    text: "Введите:"
+                    role: "large"
+
+            MDBoxLayout:
+                id: BoxTextInput
+                size_hint_y: .2
+                spacing: dp(10)
+                MDBoxLayout:
+                    HoursTextInput:
+                        # parent_color: "aquamarine"
+                        size_hint_y: 1
+                        mode: "outlined"
+                        multiline: False
+                        font_size: dp(20)
+                        halign: "center"
+                        on_text: root.show_karta_btn_turn_on()
+
+                MDBoxLayout:
+                    MinutesTextInput:
+                        size_hint_y: 1
+                        mode: "outlined"
+                        multiline: False
+                        font_size: dp(20)
+                        halign: "center"
+                        # on_text: root.search_rout_in_dict()
         MDBoxLayout:
             canvas.before:
                 Color:
@@ -64,13 +111,12 @@
                 MDBoxLayout:
                     RouteTextInputMain:
                         id: route_number_textinput
-                        bold: True
-                        markup:True
                         text: "Маршрут"
                         size_hint_y: 1
                         mode: "outlined"
                         multiline: False
                         font_size: dp(20)
+                        halign: "center"
                         on_text: root.show_karta_btn_turn_on()
 
                 MDBoxLayout:
@@ -81,6 +127,7 @@
                         mode: "outlined"
                         multiline: False
                         font_size: dp(20)
+                        halign: "center"
                         # on_text: root.search_rout_in_dict()
         MDBoxLayout:
             size_hint_y: .3

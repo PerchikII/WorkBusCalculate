@@ -1,4 +1,6 @@
 <MyPopup_save_route>:
+    box_answer_ok:box_answer_ok
+
     size_hint: (.9,.5)
     pos_hint: {"x_center": 1,"y": .5}
     title: "Внимание!"
@@ -25,10 +27,10 @@
                 text: "Конец смены"
                 color: 1,1,0
             TitleLabel:
-                text: "05:00"
+                text: root.start_work
                 color: 1,1,1
             TitleLabel:
-                text: "15:00"
+                text: root.end_work
                 color: 1,1,1
         MDBoxLayout:
             size_hint_y: .1
@@ -40,7 +42,7 @@
             rows: 1
             cols: 3
             TitleLabel:
-                text: "09:00"
+                text: root.start_lunch
                 color: 1,1,1
                 halign: "right"
             TitleLabel:
@@ -48,16 +50,17 @@
                 text: "-"
                 color: 1,1,1
             TitleLabel:
-                text: "10:30"
+                text: root.end_lunch
                 color: 1,1,1
                 halign: "left"
         MDBoxLayout:
             size_hint_y: .1
             TitleLabel:
                 text: "Заменить?"
-                color: 1,1,1
+                color: 1,0,0
 
         MDBoxLayout:
+            id: box_answer_ok
             size_hint_y: .2
             spacing: dp(10)
             Button_main:

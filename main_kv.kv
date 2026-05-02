@@ -17,12 +17,14 @@
     theme_width: "Custom"
     theme_height: "Custom"
     size_hint: (1,.9)
+
 <Button_text@MDButtonText>
     pos_hint: {"center_x": 1,"center_y": 1}
     theme_text_color: "Custom"
     text_color: "white"
     theme_font_size: "Custom"
     font_size: sp(20)
+
 <TimeBox@MDBoxLayout>
     orientation: "vertical"
     padding: 5
@@ -33,8 +35,6 @@
             width:1
             rectangle: self.x,self.y,self.width,self.height
 <TimeSpinner@Spinner>
-    size_hint: 1, 1
-    # pos_hint: {"right":1,"top":1}
     font_size: sp(30)
 
 <TitleLabel@MDLabel>
@@ -48,10 +48,6 @@
     text_size: self.size
     halign: "center"
     valign: "center"
-
-
-
-
 
 <Page_main>:
     id: page_main
@@ -93,43 +89,50 @@
                         id: lunch_time_box
                         size_hint: 1,1
                         TitleLabel:
-                            text: "     установите \nНАЧАЛО ОБЕДА"
+                            text: "    установите \n[color=#4682B4]НАЧАЛО перерыва[/color]"
                     MDBoxLayout:
-                        TimeSpinner:
-                            id: hoursstartlunch
-                            text: root.hours_start_lunch
-                            values: [str(i) for i in range(0,25)]
-                            on_text: root.start_calculate_work_time()
+                        MDBoxLayout:
+                            HoursTextInput:
+                                parent_color: app.theme_cls.primaryContainerColor
+                                id: hoursstartlunch
+                                size_hint_y: 1
+                                on_text: root.calculation_of_working()
                         TitleLabel:
                             size_hint: .1, 1
                             text: ":"
-                        TimeSpinner:
-                            id: minutesstartlunch
-                            text: root.minutes_start_lunch
-                            values: [str(i).zfill(2) for i in range(0,60)]
-                            on_text: root.start_calculate_work_time()
+                        MDBoxLayout:
+                            MinutesTextInput:
+                                parent_color: app.theme_cls.primaryContainerColor
+                                id: minutesstartlunch
+                                size_hint_y: 1
+                                on_text: root.calculation_of_working()
+
                 TimeBox:
                     size_hint_y: .2
                     MDBoxLayout:
                         orientation: "vertical"
-                        padding:[20,10,20,0]
-                        TitleLabel:
-                            text: "    установите \nКОНЕЦ ОБЕДА"
 
+                        MDBoxLayout:
+                            TitleLabel:
+                                text: "установите\n  [color=#4682B4]КОНЕЦ перерыва[/color]"
                     MDBoxLayout:
-                        TimeSpinner:
-                            id: hoursendlunch
-                            text: root.hours_end_lunch
-                            values: [str(x) for x in range(0,25)]
-                            on_text: root.start_calculate_work_time()
+                        MDBoxLayout:
+                            HoursTextInput:
+                                parent_color: app.theme_cls.primaryContainerColor
+                                id: hoursendlunch
+                                size_hint_y: 1
+                                on_text: root.calculation_of_working()
+
                         TitleLabel:
                             size_hint: .1, 1
                             text: ":"
-                        TimeSpinner:
-                            id: minutesendlunch
-                            text: root.minutes_end_lunch
-                            values: [str(x).zfill(2) for x in range(0,60)]
-                            on_text: root.start_calculate_work_time()
+                        MDBoxLayout:
+                            MinutesTextInput:
+                                parent_color: app.theme_cls.primaryContainerColor
+                                id: minutesendlunch
+                                size_hint_y: 1
+                                on_text: root.calculation_of_working()
+
                 TimeBox:
                     size_hint_y: .3
                     MDBoxLayout:
@@ -179,95 +182,100 @@
                     padding: 5
                     MDBoxLayout:
                         TitleLabel:
-                            text: "установите НАЧАЛО\n      рабочего дня"
+                            text: "  [color=#4682B4]НАЧАЛО[/color]\n рабочего дня"
                     MDBoxLayout:
-                        TimeSpinner:
-                            id: startworkhours
-                            text: root.hours_start_work
-                            values: [str(x) for x in range(0,25)]
-                            on_text: root.start_calculate_work_time()
+                        MDBoxLayout:
+                            HoursTextInput:
+                                parent_color: app.theme_cls.primaryContainerColor
+                                id: startworkhours
+                                size_hint_y: 1
+                                on_text: root.calculation_of_working()
                         TitleLabel:
                             size_hint: .1, 1
                             text: ":"
-                        TimeSpinner:
-                            id: startworkminutes
-                            text: root.minutes_start_work
-                            values: [str(x).zfill(2) for x in range(0,60)]
-                            on_text: root.start_calculate_work_time()
+                        MDBoxLayout:
+                            MinutesTextInput:
+                                parent_color: app.theme_cls.primaryContainerColor
+                                id: startworkminutes
+                                size_hint_y: 1
+                                on_text: root.calculation_of_working()
+
+
+
                 TimeBox:
                     padding: 5
                     orientation: "vertical"
                     MDBoxLayout:
                         id: box_time_end
                         TitleLabel:
-                            text: "установите КОНЕЦ\n      рабочего дня"
+                            text: "   [color=#4682B4]КОНЕЦ[/color]\n    рабочего дня"
                     MDBoxLayout:
-                        TimeSpinner:
-                            id: hoursendwork
-                            text: root.hours_end_work
-                            values: [str(x) for x in range(0,25)]
-                            on_text: root.start_calculate_work_time()
-
+                        MDBoxLayout:
+                            HoursTextInput:
+                                parent_color: app.theme_cls.primaryContainerColor
+                                id: hoursendwork
+                                size_hint_y: 1
+                                on_text: root.calculation_of_working()
                         TitleLabel:
                             size_hint: .1, 1
                             text: ":"
-                        TimeSpinner:
-                            id: minutesendwork
-                            text: root.minutes_end_work
-                            values: [str(x).zfill(2) for x in range(0,60)]
-                            on_text: root.start_calculate_work_time()
+
+                        MDBoxLayout:
+                            MinutesTextInput:
+                                parent_color: app.theme_cls.primaryContainerColor
+                                id: minutesendwork
+                                size_hint_y: 1
+                                on_text: root.calculation_of_working()
+
                 TimeBox:
                     padding: 5
+                    spacing: 10
                     orientation: "vertical"
                     MDBoxLayout:
-                        Button:
-                            size_hint:1,1
-                            font_size: 25
-                            text: "Статистика"
+                        Button_main:
                             on_release: root.show_DICT()
 #                                root.manager.transition = SlideTransition()
 #                                root.manager.transition.direction = "left"
 #                                root.manager.current = "stat_page"
-
-
+                            Button_text:
+                                # text_size: self.size
+                                pos_hint: {"center_x": .5,"center_y": .5}
+                                text: "Статистика"
+#                                halign: "center"
+#                                valign: "center"
 
                     MDBoxLayout:
                         orientation: "vertical"
                         size_hint:1,1
-                        TitleLabel:
-                            text: "Создать карточку"
-                            font_style: "Body"
-                            role: "medium"
-                            bold: True
                         Button_main:
                             on_release: root.create_route_kart()
                             Button_text:
+                                pos_hint: {"center_x": .5,"center_y": .5}
                                 # text_size: self.size
-                                text: "сохранить"
-#                                halign: "center"
-#                                valign: "center"
+                                text: "Создать\nмаршрут"
+                                halign: "center"
+                                valign: "center"
 
                 MDBoxLayout:
-
                     TimeBox:
                         size_hint_x: .7
                         orientation: "vertical"
-                        RouteTextInputMain:
-                            id: route_number_textinput
-                            text: ""
-                            mode: "outlined"
-                            multiline: False
-                            font_size: sp(40)
-                            on_text: root.search_rout_in_dict()
+                        MDBoxLayout:
+                            RouteTextInput:
+                                parent_color: app.theme_cls.primaryContainerColor
+                                id: route_number_textinput
+                                mode: "outlined"
+                                multiline: False
+                                on_text: root.search_rout_in_dict()
 
 
-                        KartaTextInputMain:
-                            id: karta_route_number_textinput
-                            text: ""
-                            mode: "outlined"
-                            multiline: False
-                            font_size: sp(40)
-                            on_text: root.search_rout_in_dict()
+                        MDBoxLayout:
+                            KartaTextInput:
+                                parent_color: app.theme_cls.primaryContainerColor
+                                id: karta_route_number_textinput
+                                mode: "outlined"
+                                multiline: False
+                                on_text: root.search_rout_in_dict()
 
                     TimeBox:
                         size_hint_x: .3
@@ -294,12 +302,19 @@
                 MDBoxLayout:
                     padding:[0,0,sp(10),0]
                     Button_main:
+                        id: save_button
                         on_release: root.intercept_data_main_screen()
+                        md_bg_color: app.theme_cls.primaryContainerColor if self.disabled else "black"
+                        disabled: True
                         Button_text:
+                            pos_hint: {"center_x": .5,"center_y": .5}
+                            role:"small"
                             text: "Сохранить"
+                            valign: "center"
                 MDBoxLayout:
                     Button_main:
                         on_release: sys.exit()
+                        md_bg_color: "black"
                         Button_text:
                             pos_hint: {"right": .7,"center_y": .5}
                             text: "Выход"
@@ -313,86 +328,10 @@
                     font_size: sp(11)
                     halign: "center"
                     valign: "center"
-<Page_stat>:
-    id: page_stat
-    name: "stat_page"
-    md_bg_color: app.theme_cls.primaryContainerColor # app.theme_cls.primaryColor # app.theme_cls.primaryContainerColor
-    MDBoxLayout:
-        id: root_stat_box
-        orientation: "vertical"
-        MDBoxLayout:
-            padding: [sp(10),sp(10),sp(10),0]
-            size_hint_y: .25
-            TimeSpinner:
-                id: spinner_day
-                size_hint: .25, 1
-                text: "27"# "root.day_spinner_str"
-                values: map(str,list(range(1,32)))
-                on_text: root.create_a_date_for_label()
-
-            TimeSpinner:
-                size_hint: .5, 1
-                id: spinner_month
-                font_size: 30
-                text:  "Сентябрь"# "root.month_spinner_str"
-                # values: root.spinner_month_lst
-                on_text: root.create_a_date_for_label()
-
-            TimeSpinner:
-                id: spinner_day
-                size_hint: .25, 1
-                # pos_hint: {"top":1}
-                text: "27"# "root.day_spinner_str"
-                values: map(str,list(range(1,32)))
-                on_text: root.create_a_date_for_label()
-        MDBoxLayout:
-            id: TwoBoxStat
-            size_hint: 1, 1
-            # md_bg_color: .1,1,.1
-            padding: sp(10)
-            MDCard:
-                orientation: "vertical"
-                size_hint: 1, 1
-                # elevation: 20
-                MDBoxLayout:
-                    orientation: "vertical"
-                    MDBoxLayout:
-                        MDLabel:
-                            text_size: self.size
-                            theme_font_size: "Custom"
-                            font_size: sp(20)
-                            bold:True
-                            text: spinner_month.text
-#                                valign: "center"
-#                                halign: "center"
-                    MDBoxLayout:
-                        MDLabel:
-                            id: card_label_id
-                            text_size: self.size
-                            theme_font_size: "Custom"
-                            font_size: sp(15)
-                            bold:True
-                            text:  "root.strig_statistic_for_label"
 
 
-        MDBoxLayout:
-            Button:
-                text: "Кнопка"
-        MDBoxLayout:
-            size_hint_y: .5
 
 
-<Page_setting>
-    id: page_sett
-    name: "setting_page"
-    md_bg_color: app.theme_cls.primaryContainerColor # app.theme_cls.primaryColor # app.theme_cls.primaryContainerColor
-    MDBoxLayout:
-        Button:
-            text: "setting"
-            on_release:
-                root.manager.transition = SlideTransition()
-                root.manager.transition.direction = "down"
-                root.manager.current = "main_page"
 
 
 
