@@ -145,6 +145,7 @@
                         size_hint_y: .15
                         TitleLabel:
                             id: savingtext
+                            theme_text_color: "Custom"
                             text: root.lab_save_txt
                             role: "large"
                             halign: "center"
@@ -177,6 +178,45 @@
             MDBoxLayout:
                 id: right_box
                 orientation: "vertical"
+                MDBoxLayout:
+                    TimeBox:
+                        size_hint_x: .7
+                        orientation: "vertical"
+                        MDBoxLayout:
+                            RouteTextInput:
+                                parent_color: app.theme_cls.primaryContainerColor
+                                id: route_number_textinput
+                                mode: "outlined"
+                                multiline: False
+                                # text_color_normal: "black"
+                                # on_text: root.search_rout_in_dict()
+
+
+                        MDBoxLayout:
+                            KartaTextInput:
+                                parent_color: app.theme_cls.primaryContainerColor
+                                id: karta_route_number_textinput
+                                mode: "outlined"
+                                multiline: False
+                                # text_color_normal: "black"
+                                # on_text: root.search_rout_in_dict()
+
+                    TimeBox:
+                        size_hint_x: .3
+                        ToggleButton:
+                            id:sm_1
+                            text: "1"
+                            group:'smena'
+                            state:'down'
+                        ToggleButton:
+                            id:sm_2
+                            text: "2"
+                            group:'smena'
+
+
+
+
+
 
                 TimeBox:
                     padding: 5
@@ -248,7 +288,10 @@
                         orientation: "vertical"
                         size_hint:1,1
                         Button_main:
+                            id: create_route
                             on_release: root.create_route_kart()
+                            md_bg_color: app.theme_cls.primaryContainerColor if self.disabled else "black"
+                            disabled: True
                             Button_text:
                                 pos_hint: {"center_x": .5,"center_y": .5}
                                 # text_size: self.size
@@ -256,38 +299,7 @@
                                 halign: "center"
                                 valign: "center"
 
-                MDBoxLayout:
-                    TimeBox:
-                        size_hint_x: .7
-                        orientation: "vertical"
-                        MDBoxLayout:
-                            RouteTextInput:
-                                parent_color: app.theme_cls.primaryContainerColor
-                                id: route_number_textinput
-                                mode: "outlined"
-                                multiline: False
-                                on_text: root.search_rout_in_dict()
 
-
-                        MDBoxLayout:
-                            KartaTextInput:
-                                parent_color: app.theme_cls.primaryContainerColor
-                                id: karta_route_number_textinput
-                                mode: "outlined"
-                                multiline: False
-                                on_text: root.search_rout_in_dict()
-
-                    TimeBox:
-                        size_hint_x: .3
-                        ToggleButton:
-                            id:sm_1
-                            text: "1"
-                            group:'smena'
-                            state:'down'
-                        ToggleButton:
-                            id:sm_2
-                            text: "2"
-                            group:'smena'
 
 
 
@@ -303,13 +315,13 @@
                     padding:[0,0,sp(10),0]
                     Button_main:
                         id: save_button
-                        on_release: root.intercept_data_main_screen()
+                        on_release: root.intercept_and_save_alldata()
                         md_bg_color: app.theme_cls.primaryContainerColor if self.disabled else "black"
                         disabled: True
                         Button_text:
                             pos_hint: {"center_x": .5,"center_y": .5}
                             role:"small"
-                            text: "Сохранить"
+                            text: "Сохранить\n      дату"
                             valign: "center"
                 MDBoxLayout:
                     Button_main:
