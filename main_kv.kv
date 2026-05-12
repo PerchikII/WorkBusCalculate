@@ -75,21 +75,6 @@
                             orientation: "vertical"
                             MDBoxLayout:
                                 size_hint_y: .5
-                                MDIconButton:
-                                    # theme_line_color: "Custom"
-                                    # theme_focus_color: "Custom"
-                                    height: sp(20)
-                                    width: sp(20)
-                                    focus_color: 1,0,1,.4
-                                    line_color: 1,0,0
-                                    icon: "menu"
-                                    pos_hint: {"x":1,"top":1}
-                                    on_release: print(dir(self))
-#                                        root.manager.transition = SwapTransition()
-#                                        root.manager.current = "sett_page"
-                            MDBoxLayout:
-
-                                size_hint_y: .5
                                 TitleLabel:
                                     text: "Дата"
                                     role: "large"

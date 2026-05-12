@@ -190,10 +190,30 @@ class Page_main(MDScreen):
     def show_DICT(self):
         print("DICT_TIME #########################################")
         pprint(DICT_TIME)
-
         print("DICT_ROUTE_WKDAY #########################################")
         pprint(DICT_ROUTE)
         print("+++++++++++++++++++++++++++++++++")
+
+    def search_workday(self):
+        DATA = self.get_user_choice_date()
+        if DATA in DICT_TIME:
+            try:
+                route,karta = DICT_TIME[DATA][0].split("/")
+                self.ids.route_number_textinput.font_size = "25dp"
+                self.ids.karta_route_number_textinput.font_size = "25dp"
+                self.ids.route_number_textinput.text = route
+                self.ids.karta_route_number_textinput.text = karta
+            except ValueError:
+                self.ids.route_number_textinput.font_size = "15dp"
+                self.ids.route_number_textinput.text = "Маршрут"
+                self.ids.karta_route_number_textinput.font_size = "18dp"
+                self.ids.karta_route_number_textinput.text = "Карта"
+                list_time:list = DICT_TIME[DATA][2]
+                self.install_time_in_textinput(list_time[0],list_time[1],
+                                               list_time[2],list_time[3],
+                                               list_time[4],list_time[5],
+                                               list_time[6],list_time[7])
+
 
 
     def check_route_in_dict(self, route) -> list:
@@ -203,13 +223,11 @@ class Page_main(MDScreen):
         except KeyError:
             return ["", "", "", ""]
 
-
     def get_button_smena(self):
         if self.ids.sm_1.state == "down":
             return 0
         elif self.ids.sm_2.state == "down":
             return 1
-
 
     def get_user_choice_date(self):
         day = self.ids["spinner_day"].text
@@ -223,34 +241,16 @@ class Page_main(MDScreen):
             MyPopup_install_time(route_and_karta,
                                  smena,
                                  self.install_time_in_textinput)
-
-
         all_time_user_input: list = self.get_all_time_user_input()  # возвр все часы\минуты
         if check_value_is_numeric(all_time_user_input):
             self.check_route_input()
 
-
-            # list_time = DICT_ROUTE[route_and_karta]
-            # HW_start = list_time[0]
-            # MW_start = list_time[1]
-            # HW_end = list_time[2]
-            # MW_end = list_time[3]
-            # HL_start = list_time[4]
-            # ML_start = list_time[5]
-            # HL_end = list_time[6]
-            # ML_end = list_time[7]
-            # self.install_time_in_textinput(HW_start, MW_start, HW_end, MW_end, HL_start, ML_start, HL_end, ML_end)
-
-
-
     def install_time_in_textinput(self, HW_start, MW_start, HW_end, MW_end, HL_start, ML_start, HL_end, ML_end):
-
         tuple_input_time = ("startworkhours","startworkminutes",
                             "hoursendwork","minutesendwork",
                             "hoursstartlunch","minutesstartlunch",
                             "hoursendlunch","minutesendlunch")
         for textinput_name in tuple_input_time:
-
             self.ids[textinput_name].font_size = "30dp"
             self.ids[textinput_name].bold = True
             self.ids[textinput_name].text_color_normal = (1,0,0)
@@ -560,6 +560,7 @@ class RouteTextInput(MDTextField):
         self.halign = "center"
         self.bold = True
         self.theme_text_color = "Custom"
+        self.text_color_normal = "black"
     def insert_text(self, value, from_undo=False):
         if value.isdigit():
             if len(self.text) < 3:
@@ -581,6 +582,7 @@ class KartaTextInput(MDTextField):
         self.halign = "center"
         self.bold = True
         self.theme_text_color = "Custom"
+        self.text_color_normal = "black"
 
     def insert_text(self, value, from_undo=False):
         if value.isdigit():
