@@ -218,18 +218,29 @@ class Page_main(MDScreen):
 
     def search_rout_in_dict(self):
         route_and_karta = self.get_route_user_choice()
+        smena = self.get_button_smena()
         if route_and_karta in DICT_ROUTE:
-            list_time = DICT_ROUTE[route_and_karta]
-            HW_start = list_time[0]
-            MW_start = list_time[1]
-            HW_end = list_time[2]
-            MW_end = list_time[3]
-            HL_start = list_time[4]
-            ML_start = list_time[5]
-            HL_end = list_time[6]
-            ML_end = list_time[7]
-            self.install_time_in_textinput(HW_start, MW_start, HW_end, MW_end, HL_start, ML_start, HL_end, ML_end)
-        self.calculation_of_working()
+            MyPopup_install_time(route_and_karta,
+                                 smena,
+                                 self.install_time_in_textinput)
+
+
+        all_time_user_input: list = self.get_all_time_user_input()  # возвр все часы\минуты
+        if check_value_is_numeric(all_time_user_input):
+            self.check_route_input()
+
+
+            # list_time = DICT_ROUTE[route_and_karta]
+            # HW_start = list_time[0]
+            # MW_start = list_time[1]
+            # HW_end = list_time[2]
+            # MW_end = list_time[3]
+            # HL_start = list_time[4]
+            # ML_start = list_time[5]
+            # HL_end = list_time[6]
+            # ML_end = list_time[7]
+            # self.install_time_in_textinput(HW_start, MW_start, HW_end, MW_end, HL_start, ML_start, HL_end, ML_end)
+
 
 
     def install_time_in_textinput(self, HW_start, MW_start, HW_end, MW_end, HL_start, ML_start, HL_end, ML_end):
@@ -239,6 +250,7 @@ class Page_main(MDScreen):
                             "hoursstartlunch","minutesstartlunch",
                             "hoursendlunch","minutesendlunch")
         for textinput_name in tuple_input_time:
+
             self.ids[textinput_name].font_size = "30dp"
             self.ids[textinput_name].bold = True
             self.ids[textinput_name].text_color_normal = (1,0,0)
@@ -317,11 +329,8 @@ class Page_main(MDScreen):
             save_HDD_DICT(DICT_TIME, WORK_TIME_FILE)
             self.change_save_text_label()
         else:
-            MyPopup_save_new_worktime(KEY,route_and_karta_in_day,(self.total_hours_work, self.total_minutes_work),
-                                  all_time_user_input,label_save_text)
-        pprint(DICT_TIME,)
-        print("строка 322")
-
+            MyPopup_save_new_workday(KEY, route_and_karta_in_day, (self.total_hours_work, self.total_minutes_work),
+                                     all_time_user_input, label_save_text)
 
 
     def create_route_kart(self):
@@ -334,12 +343,6 @@ class Page_main(MDScreen):
         MyPopup_weekday_or_weekend(num_route,all_time_route,button_smena,list_time_in_route,label_savetext)
 
 
-        # DICT,FILE = check_smena(all_time_route[0])
-        # DICT[route] = all_time_route
-        # self.change_save_text_label()
-        # save_HDD_DICT(DICT,FILE)
-
-
     def my_callback(self, instance):
         self.ids.savingtext.text_color = "black"
         self.ids.savingtext.text = "Отработано:"
@@ -349,41 +352,68 @@ class Page_main(MDScreen):
         Clock.schedule_once(self.my_callback, 2)
         # self.label.theme_text_color = "Custom"
         self.ids.savingtext.text_color = "red"
-        self.label.text = "Сохранено"
+        self.ids.savingtext.text = "Сохранено"
+
+
+class MyPopup_install_time(Popup):
+    Builder.load_file(os.path.join(dir_name, "Popup_install_time.kv"))
+    def __init__(self,route:str,smena:int,install_func,**kwargs):
+        Popup.__init__(self, **kwargs)
+        self.KEY = route
+        self.smena = smena
+        self.INSTALL_FUNC = install_func
+        self.open()
+
+    def weekday(self):
+        try:
+            list_time = DICT_ROUTE[self.KEY][self.smena]
+            HW_start = list_time[0]
+            MW_start = list_time[1]
+            HW_end = list_time[2]
+            MW_end = list_time[3]
+            HL_start = list_time[4]
+            ML_start = list_time[5]
+            HL_end = list_time[6]
+            ML_end = list_time[7]
+            self.INSTALL_FUNC(HW_start,MW_start,
+                              HW_end,MW_end,
+                              HL_start,ML_start,
+                              HL_end,ML_end)
+        except IndexError:
+            self.INSTALL_FUNC(HW_start="-", MW_start="-",
+                              HW_end="-", MW_end="-",
+                              HL_start="-", ML_start="-",
+                              HL_end="-", ML_end="-")
+        self.dismiss()
+
+    def weekend(self):
+        self.smena += 2
+        try:
+            list_time = DICT_ROUTE[self.KEY][self.smena]
+            HW_start = list_time[0]
+            MW_start = list_time[1]
+            HW_end = list_time[2]
+            MW_end = list_time[3]
+            HL_start = list_time[4]
+            ML_start = list_time[5]
+            HL_end = list_time[6]
+            ML_end = list_time[7]
+            self.INSTALL_FUNC(HW_start, MW_start,
+                              HW_end, MW_end,
+                              HL_start, ML_start,
+                              HL_end, ML_end)
+        except IndexError:
+            self.INSTALL_FUNC(HW_start= "-", MW_start= "-",
+                              HW_end= "-", MW_end= "-",
+                              HL_start= "-", ML_start= "-",
+                              HL_end= "-", ML_end= "-")
+        self.dismiss()
 
 
 
 
 
-
-
-#######################################################################################
-
-    def save_data_in_dict_route(self, route: str, spinners: list):
-        label_text_save = self.ids["savingtext"]
-        check_key = self.check_day_in_dict(route, flag=False)
-        if check_key:
-            MyPoput_save_route(route, spinners, label_text_save)
-        else:
-            DICT_ROUTE[route] = spinners
-            save_HDD_DICT_TIME(DICT_ROUTE, "route_data.dat")
-            self.change_save_text_label()
-
-    def my_callback(self, instance):
-        self.ids["savingtext"].text_color = "black"
-        self.lab_save_txt = "Отработано:"
-        return False
-
-    def change_save_text_label(self):
-        Clock.schedule_once(self.my_callback, 2)
-        self.ids["savingtext"].theme_text_color = "Custom"
-        self.ids["savingtext"].text_color = "red"
-        self.lab_save_txt = "Сохранено"
-
-
-
-
-class MyPopup_save_new_worktime(Popup):
+class MyPopup_save_new_workday(Popup):
 
     curr_data = StringProperty()
     route_str = StringProperty()
@@ -393,13 +423,12 @@ class MyPopup_save_new_worktime(Popup):
     start_lunch = StringProperty()
     end_lunch = StringProperty()
 
-    Builder.load_file(os.path.join(dir_name, "Popup_new_time.kv"))
+    Builder.load_file(os.path.join(dir_name, "Popup_new_day.kv"))
     def __init__(self,date,route,tot_work_time,lst_time, lab,**kwargs):
         Popup.__init__(self, **kwargs)
         self.KEY = date
-        self.tot_work_time = tot_work_time
+        self.total_work_time = tot_work_time
         self.route = route
-
         self.list_time = lst_time
         self.install_time_work_in_labels()
         self.label = lab
@@ -416,8 +445,7 @@ class MyPopup_save_new_worktime(Popup):
         self.end_lunch = checking_the_time(list_time[6],list_time[7])
 
     def answer_ok(self):
-        print("answer_ok")
-        DICT_TIME[self.KEY] = (self.route, self.tot_work_time, self.list_time)
+        DICT_TIME[self.KEY] = (self.route, self.total_work_time, self.list_time)
         save_HDD_DICT(DICT_TIME, WORK_TIME_FILE)
         self.change_save_text_label()
         self.dismiss()
@@ -475,8 +503,6 @@ class MyPopup_weekday_or_weekend(Popup):
         Clock.schedule_once(self.my_callback, 3)
         self.label_savetext.text_color = "red"
         self.label_savetext.text = "Сохранено"
-
-
 
 class MyPopup_save_new_route(Popup):
     route_str = StringProperty()

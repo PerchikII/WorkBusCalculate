@@ -1,0 +1,21 @@
+<MyPopup_install_time>:
+    size_hint: (.9,.2)
+    pos_hint: {"x_center": 1,"y": .75}
+    title: "Внимание!"
+    halign: "center"
+    title_size: sp(20)
+    title_align: "center"
+    separator_color: "blue"
+    MDBoxLayout:
+        Button_main:
+            on_release: root.weekday()
+
+            Button_text:
+                pos_hint: {"center_x": .5,"center_y": .5}
+                text: "Будний день"
+        Button_main:
+            on_release: root.weekend()
+
+            Button_text:
+                pos_hint: {"center_x": .5,"center_y": .5}
+                text: "Выходной"

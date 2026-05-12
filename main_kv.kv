@@ -70,17 +70,49 @@
                     orientation: "vertical"
                     MDBoxLayout:
                         size_hint_y: .6
-                        TitleLabel:
-                            text: "Дата"
-                        TimeSpinner:
-                            id: spinner_day
-                            text: root.day_spinner
-                            values: map(str,list(range(1,32)))
+                        MDBoxLayout:
+                            size_hint_x: .6
+                            orientation: "vertical"
+                            MDBoxLayout:
+                                size_hint_y: .5
+                                MDIconButton:
+                                    # theme_line_color: "Custom"
+                                    # theme_focus_color: "Custom"
+                                    height: sp(20)
+                                    width: sp(20)
+                                    focus_color: 1,0,1,.4
+                                    line_color: 1,0,0
+                                    icon: "menu"
+                                    pos_hint: {"x":1,"top":1}
+                                    on_release: print(dir(self))
+#                                        root.manager.transition = SwapTransition()
+#                                        root.manager.current = "sett_page"
+                            MDBoxLayout:
+
+                                size_hint_y: .5
+                                TitleLabel:
+                                    text: "Дата"
+                                    role: "large"
+                                    halign: "center"
+
+                        MDBoxLayout:
+                            size_hint_x: .4
+                            TimeSpinner:
+                                id: spinner_day
+                                text: root.day_spinner
+                                on_text: root.search_workday()
+                                values: map(str,list(range(1,32)))
+
+
+
+
+
                     MDBoxLayout:
                         size_hint_y: .4
                         TimeSpinner:
                             id: spinner_month
                             text:  root.month_spinner_str
+                            on_text: root.search_workday()
                             values: root.month_spinner_lst
                             font_size: 30
                 TimeBox:
@@ -189,7 +221,7 @@
                                 mode: "outlined"
                                 multiline: False
                                 # text_color_normal: "black"
-                                # on_text: root.search_rout_in_dict()
+                                on_text: root.search_rout_in_dict()
 
 
                         MDBoxLayout:
@@ -199,7 +231,7 @@
                                 mode: "outlined"
                                 multiline: False
                                 # text_color_normal: "black"
-                                # on_text: root.search_rout_in_dict()
+                                on_text: root.search_rout_in_dict()
 
                     TimeBox:
                         size_hint_x: .3
