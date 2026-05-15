@@ -36,6 +36,9 @@
             rectangle: self.x,self.y,self.width,self.height
 <TimeSpinner@Spinner>
     font_size: sp(30)
+    color: "#FF4500"
+    background_color: "black"
+    bold: True
 
 <TitleLabel@MDLabel>
     markup: True
@@ -85,33 +88,28 @@
                             TimeSpinner:
                                 id: spinner_day
                                 text: root.day_spinner
-                                on_text: root.search_workday()
+                                on_text: root.change_data()
                                 values: map(str,list(range(1,32)))
-
-
-
-
-
                     MDBoxLayout:
                         size_hint_y: .4
                         TimeSpinner:
                             id: spinner_month
                             text:  root.month_spinner_str
-                            on_text: root.search_workday()
+                            on_text: root.change_data();root.show_DICT()
                             values: root.month_spinner_lst
-                            font_size: 30
+                            bold: False
                 TimeBox:
                     size_hint_y: .2
                     MDBoxLayout:
                         id: lunch_time_box
                         size_hint: 1,1
                         TitleLabel:
-                            text: "    установите \n[color=#4682B4]НАЧАЛО перерыва[/color]"
+                            text: "[color=#1E90FF]НАЧАЛО\n рабочего дня[/color]"
                     MDBoxLayout:
                         MDBoxLayout:
                             HoursTextInput:
                                 parent_color: app.theme_cls.primaryContainerColor
-                                id: hoursstartlunch
+                                id: startworkhours
                                 size_hint_y: 1
                                 on_text: root.calculation_of_working()
                         TitleLabel:
@@ -120,7 +118,7 @@
                         MDBoxLayout:
                             MinutesTextInput:
                                 parent_color: app.theme_cls.primaryContainerColor
-                                id: minutesstartlunch
+                                id: startworkminutes
                                 size_hint_y: 1
                                 on_text: root.calculation_of_working()
 
@@ -131,12 +129,12 @@
 
                         MDBoxLayout:
                             TitleLabel:
-                                text: "установите\n  [color=#4682B4]КОНЕЦ перерыва[/color]"
+                                text: "[color=#2E8B40]КОНЕЦ\n рабочего дня[/color]"
                     MDBoxLayout:
                         MDBoxLayout:
                             HoursTextInput:
                                 parent_color: app.theme_cls.primaryContainerColor
-                                id: hoursendlunch
+                                id: hoursendwork
                                 size_hint_y: 1
                                 on_text: root.calculation_of_working()
 
@@ -146,7 +144,7 @@
                         MDBoxLayout:
                             MinutesTextInput:
                                 parent_color: app.theme_cls.primaryContainerColor
-                                id: minutesendlunch
+                                id: minutesendwork
                                 size_hint_y: 1
                                 on_text: root.calculation_of_working()
 
@@ -155,7 +153,6 @@
                     MDBoxLayout:
                         size_hint_y: .15
                         TitleLabel:
-                            id: root.date_a_day
                             text: root.date_total_time
                             role: "large"
                     MDBoxLayout:
@@ -225,10 +222,22 @@
                             text: "1"
                             group:'smena'
                             state:'down'
+                            bold: True
+                            font_size: sp(35)
+                            on_press: self.font_size=sp(35); sm_2.font_size = sp(15)
+                            # on_release: self.font_size=sp(30)
+                        TitleLabel:
+                            size_hint_y: .5
+                            text: "смена"
+                            font_style: "Body"
+                            role: "small"
+                            bold: False
                         ToggleButton:
                             id:sm_2
                             text: "2"
                             group:'smena'
+                            bold: True
+                            on_press: self.font_size=sp(35); sm_1.font_size = sp(15)
 
 
 
@@ -239,12 +248,12 @@
                     padding: 5
                     MDBoxLayout:
                         TitleLabel:
-                            text: "  [color=#4682B4]НАЧАЛО[/color]\n рабочего дня"
+                            text: "  Установите\n [color=#A52A2A]НАЧАЛО перерыва[/color]"
                     MDBoxLayout:
                         MDBoxLayout:
                             HoursTextInput:
                                 parent_color: app.theme_cls.primaryContainerColor
-                                id: startworkhours
+                                id: hoursstartlunch
                                 size_hint_y: 1
                                 on_text: root.calculation_of_working()
                         TitleLabel:
@@ -253,7 +262,7 @@
                         MDBoxLayout:
                             MinutesTextInput:
                                 parent_color: app.theme_cls.primaryContainerColor
-                                id: startworkminutes
+                                id: minutesstartlunch
                                 size_hint_y: 1
                                 on_text: root.calculation_of_working()
 
@@ -263,14 +272,13 @@
                     padding: 5
                     orientation: "vertical"
                     MDBoxLayout:
-                        id: box_time_end
                         TitleLabel:
-                            text: "   [color=#4682B4]КОНЕЦ[/color]\n    рабочего дня"
+                            text: "Установите\n[color=#A52A2A]КОНЕЦ перерыва[/color]"
                     MDBoxLayout:
                         MDBoxLayout:
                             HoursTextInput:
                                 parent_color: app.theme_cls.primaryContainerColor
-                                id: hoursendwork
+                                id: hoursendlunch
                                 size_hint_y: 1
                                 on_text: root.calculation_of_working()
                         TitleLabel:
@@ -280,7 +288,7 @@
                         MDBoxLayout:
                             MinutesTextInput:
                                 parent_color: app.theme_cls.primaryContainerColor
-                                id: minutesendwork
+                                id: minutesendlunch
                                 size_hint_y: 1
                                 on_text: root.calculation_of_working()
 
@@ -290,8 +298,7 @@
                     orientation: "vertical"
                     MDBoxLayout:
                         Button_main:
-                            on_release: root.show_DICT()
-#                                root.manager.transition = SlideTransition()
+                            on_release: root.show_DICT();root.show_statistic()
 #                                root.manager.transition.direction = "left"
 #                                root.manager.current = "stat_page"
                             Button_text:
@@ -307,11 +314,11 @@
                         Button_main:
                             id: create_route
                             on_release: root.create_route_kart()
-                            md_bg_color: app.theme_cls.primaryContainerColor if self.disabled else "black"
+                            md_bg_color: app.theme_cls.primaryContainerColor if self.disabled else (1,0,0,.5)#"black"
                             disabled: True
                             Button_text:
                                 pos_hint: {"center_x": .5,"center_y": .5}
-                                # text_size: self.size
+                                text_color: "black"
                                 text: "Создать\nмаршрут"
                                 halign: "center"
                                 valign: "center"
@@ -333,10 +340,11 @@
                     Button_main:
                         id: save_button
                         on_release: root.intercept_and_save_alldata()
-                        md_bg_color: app.theme_cls.primaryContainerColor if self.disabled else "black"
+                        md_bg_color: app.theme_cls.primaryContainerColor if self.disabled else (0,0,1,.5)#"black"
                         disabled: True
                         Button_text:
                             pos_hint: {"center_x": .5,"center_y": .5}
+                            text_color: "black"
                             role:"small"
                             text: "Сохранить\n      дату"
                             valign: "center"
@@ -357,179 +365,3 @@
                     font_size: sp(11)
                     halign: "center"
                     valign: "center"
-
-
-
-
-
-
-
-
-
-#
-#                    TitleLabel:
-#                        id:label_data
-#                        text_size: self.size
-#                        valign: "bottom"
-#                        halign: "center"
-#                        size_hint:.5,1
-#                        pos_hint:{'center_x':.5,"top":1}
-#                        # text: "На дату:\n"+' '.join(root.label_month_lst)
-#                        color: 0,0,0
-#                        font_size: 30
-#        MDBoxLayout:
-#            padding:[20,0,20,0]
-#            size_hint:1,.1
-#            TitleLabel:
-#                size_hint:.8,1
-#                text: root.lab_save_txt
-#                text_size: self.size
-#                valign: "center"
-#                halign: "left"
-#                font_size: 50
-#                color: 0,0,0
-#            TitleLabel:
-#                size_hint:.2,1
-#                text_size: self.size
-#                valign: "center"
-#                halign: "center"
-#                text: root.total_hours_work
-#                font_size: 50
-#                color: 0,0,0
-#            TitleLabel:
-#                size_hint:.2,1
-#                text_size: self.size
-#                valign: "center"
-#                halign: "center"
-#                text: "Часов"
-#                font_size: 30
-#                color: 0,0,0
-#            TitleLabel:
-#                size_hint:.2,1
-#                text_size: self.size
-#                valign: "center"
-#                halign: "center"
-#                text: root.total_minutes_work
-#                font_size: 50
-#                color: 0,0,0
-#            TitleLabel:
-#                size_hint:.2,1
-#                text_size: self.size
-#                valign: "center"
-#                halign: "center"
-#                text: "Минут"
-#                font_size: 30
-#                color: 0,0,0
-#        MDBoxLayout:
-#            size_hint:1,.045
-#            padding:20
-#            Button:
-#                id: btn_save_file
-#                size_hint:1,1
-#                pos_hint:{'center_x':.5,"top":1}
-#                text: "Сохранить"
-#                font_size: 30
-#                on_press: root.validate_file_time_work()#;root.load_next()
-#            Button:
-#                size_hint:1,1
-#                pos_hint:{'center_x':.5,"top":1}
-#                text: "Выход"
-#                font_size: 30
-#                on_press: app.quit_program()
-
-#<Pages_stat>:
-#    BoxLayout:
-#        orientation: "vertical"
-#        size:root.size
-#        BoxLayout:
-#            size_hint: 1, .1
-#            Label:
-#                text: 'Отработано за период:'
-#                font_size: 50
-#                size_hint: 1, 1
-#                text_size:self.size
-#                halign:"center"
-#                color: 0,0,0
-#        BoxLayout:
-#            padding: [100,0,100,0]
-#            spacing: 20
-#            size_hint: 1, .055
-#            BoxLayout:
-#                TimeSpinner:
-#                    id: from_total_days
-#                    size_hint: .1, 1
-#                    text: root.from_total_days_spinner
-#                    values: root.list_from_total_days
-#                    on_text: root.create_choice_spinner(self)
-#
-#                TimeSpinner:
-#                    id: from_total_month
-#                    size_hint: .4, 1
-#                    text: root.total_month_spinner
-#                    values: root.spinner_month_statistic_lst
-#                    on_text: root.create_choice_spinner(self)
-#                TimeSpinner:
-#                    id: to_total_days
-#                    size_hint: .1, 1
-#                    text: root.to_total_days_spinner
-#                    values: root.list_to_total_days
-#                    on_text: root.create_choice_spinner(self)
-#        BoxLayout:
-#            size_hint: 1,.055
-#            Label:
-#                text: "Часов"
-#                text_size:self.size
-#                halign:"center"
-#                font_size: 50
-#                size_hint: 1, 1
-#                color: 0,0,0
-#            Label:
-#                text: "Минут"
-#                text_size:self.size
-#                halign:"center"
-#                font_size: 50
-#                size_hint: 1, 1
-#                color: 0,0,0
-#
-#        BoxLayout:
-#            size_hint: 1,.1
-#            Label:
-#                id: tot_hours_statistic
-#                text: root.total_hours_work_statistic
-#                text_size:self.size
-#                halign:"center"
-#                valign:"top"
-#                font_size: 50
-#                size_hint: 1, 1
-#                color: 0,0,0
-#            Label:
-#                id: tot_minutes_statistic
-#                text: root.total_minutes_work_statistic
-#                text_size:self.size
-#                halign:"center"
-#                valign:"top"
-#                font_size: 50
-#                size_hint: 1, 1
-#                color: 0,0,0
-#        BoxLayout:
-#            orientation:
-#            padding: [5,0,5,0]
-#            spacing: 10
-#            size_hint: 1,.2
-#            Button:
-#                text: "Очистить текущий месяц"
-#                size_hint: .5,.21
-#                pos_hint: {"top":1}
-#                font_size: 32
-#                text_size: self.size
-#                valign: "center"
-#            Button:
-#                text: "Очистить всю статистику"
-#                size_hint: .5,.21
-#                pos_hint: {"top":1}
-#                font_size: 32
-#                text_size: self.size
-#                valign: "center"
-
-
-

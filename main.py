@@ -9,6 +9,7 @@
 
 import time
 import os
+import datetime
 from datetime import timedelta
 import pickle
 from pprint import pprint
@@ -19,18 +20,13 @@ if platform == "win32":
 
 from kivymd.app import MDApp
 from kivy.uix.popup import Popup
-from kivymd.uix.label import MDLabel
-from kivy.uix.button import Button
 from kivymd.uix.screenmanager import MDScreenManager
-from kivy.uix.screenmanager import SlideTransition
 from kivymd.uix.screen import MDScreen
 from kivymd.uix.textfield import MDTextField
-from kivymd.uix.boxlayout import MDBoxLayout
-from kivy.factory import Factory
 from kivy.lang.builder import Builder
 from kivy.properties import ListProperty, StringProperty
 from kivy.clock import Clock
-from kivy.core.window import Window
+
 
 
 WORK_TIME_FILE = "worktime_data.dat"
@@ -96,34 +92,35 @@ number_month = int(time.strftime("%m", time_day))
 CURRENT_MONTH = month_lst[number_month - 1]
 
 class PagesManager(MDScreenManager):
-    def __init__(self, **kwargs):
-        MDScreenManager.__init__(self, **kwargs)
+   pass
 
-    # def on_touch_down(self, touch):
-    #     self.tap_X_Down = touch.x
-    #     self.tap_Y_Down = touch.y
-    #     return super(PagesManager, self).on_touch_down(touch)
+def exchange_worktime(sec):
+    td = timedelta(seconds=sec)    
+    hours, remainder = divmod(td.seconds, 3600)
+    minutes, seconds = divmod(remainder, 60)
+    if td.days > 0:
+        hours = hours + td.days * 24
+    return hours,minutes
+    
+    
+def get_all_worktime(all_date):
+    all_seconds = timedelta()#timedelta(hours=0, minutes=0)
+    for data in DICT_TIME:
+        hour = int(DICT_TIME[data][1][0])
+        minutes = int(DICT_TIME[data][1][1])
+        obj_time = timedelta(hours=hour, minutes=minutes)
+        all_seconds+=obj_time
+    total_sec = all_seconds.total_seconds()
+    tot_work_time = exchange_worktime(total_sec)
+    return tot_work_time
 
-    # def on_touch_up(self, touch):
-    #     self.tap_X_Up = touch.x
-    #     self.tap_Y_Up = touch.y
-    #     if (self.tap_X_Down - self.tap_X_Up) > 100:
-    #         if self.current == "main_screen":
-    #             self.transition = SlideTransition()
-    #             self.transition.direction = "left"
-    #             self.current = "main_page"
-    #
-    #     if self.tap_X_Down < self.tap_X_Up:
-    #         if self.current == "main_page":
-    #             self.transition = SlideTransition()
-    #             self.transition.direction = "right"
-    #             self.current = "main_screen"
-    #
-    #     if (self.tap_Y_Down - self.tap_Y_Up) > 100:
-    #         if self.current == "main_page":
-    #             self.transition.direction = "down"
-    #             self.current = "setting_page"
-    #     return super(PagesManager, self).on_touch_up(touch)
+def get_all_dates_from_choice_month(choice_month) -> list:
+    list_month = []  # Только даты выбранного месяца
+    for i in DICT_TIME:  # Получаем в i ключи словаря
+        if i.split()[1] == choice_month:  # Определяем нужный месяц из списка. Вычленяем название месяца
+            list_month.append(i)  # Записываем в список только даты с нужным месяцем
+    return list_month
+
 
 def checking_the_time(hours,minutes):
     if hours.isdigit() and minutes.isdigit():
@@ -166,6 +163,29 @@ def get_route(route_str:str):
         route, karta = "Не введён", ""
         return route, karta
 
+def check_route_in_dict(route) -> list:
+    try:
+        time_in_route = DICT_ROUTE[route]
+        return time_in_route
+    except KeyError:
+        return ["", "", "", ""]
+
+def get_karta(day):
+    try:
+        route_and_karta = DICT_TIME[day][0].split("/")
+        return route_and_karta[0],route_and_karta[1],
+    except (KeyError,IndexError):
+        print("KEYERROR")
+        return "Не введён", ""
+
+def get_karta_worktime(day):
+    try:
+        hours_and_min = DICT_TIME[day][1]
+        return hours_and_min[0],hours_and_min[1]
+    except KeyError:
+        return "",""
+
+
 ################################################################################
 ################################################################################
 ################################################################################
@@ -186,42 +206,43 @@ class Page_main(MDScreen):
 
     def __init__(self, **kwargs):
         MDScreen.__init__(self, **kwargs)
-
-    def show_DICT(self):
+    @staticmethod
+    def show_DICT():
         print("DICT_TIME #########################################")
         pprint(DICT_TIME)
         print("DICT_ROUTE_WKDAY #########################################")
         pprint(DICT_ROUTE)
         print("+++++++++++++++++++++++++++++++++")
 
-    def search_workday(self):
-        DATA = self.get_user_choice_date()
-        if DATA in DICT_TIME:
-            try:
-                route,karta = DICT_TIME[DATA][0].split("/")
-                self.ids.route_number_textinput.font_size = "25dp"
-                self.ids.karta_route_number_textinput.font_size = "25dp"
-                self.ids.route_number_textinput.text = route
-                self.ids.karta_route_number_textinput.text = karta
-            except ValueError:
-                self.ids.route_number_textinput.font_size = "15dp"
-                self.ids.route_number_textinput.text = "Маршрут"
-                self.ids.karta_route_number_textinput.font_size = "18dp"
-                self.ids.karta_route_number_textinput.text = "Карта"
-                list_time:list = DICT_TIME[DATA][2]
-                self.install_time_in_textinput(list_time[0],list_time[1],
-                                               list_time[2],list_time[3],
-                                               list_time[4],list_time[5],
-                                               list_time[6],list_time[7])
+    def show_statistic(self):
+        current_date = self.get_user_choice_date()
+        MyPopup_page_stat(current_date).open()
 
+    # def search_workday(self):
+    #     DATA = self.get_user_choice_date()
+    #     if DATA in DICT_TIME:
+    #         try:
+    #             route,karta = DICT_TIME[DATA][0].split("/")
+    #             self.ids.route_number_textinput.font_size = "25dp"
+    #             self.ids.karta_route_number_textinput.font_size = "25dp"
+    #             self.ids.route_number_textinput.text = route
+    #             self.ids.karta_route_number_textinput.text = karta
+    #         except ValueError:
+    #             self.ids.route_number_textinput.font_size = "15dp"
+    #             self.ids.route_number_textinput.text = "Маршрут"
+    #             self.ids.karta_route_number_textinput.font_size = "18dp"
+    #             self.ids.karta_route_number_textinput.text = "Карта"
+    #             list_time:list = DICT_TIME[DATA][2]
+    #             self.install_time_in_textinput(list_time[0],list_time[1],
+    #                                            list_time[2],list_time[3],
+    #                                            list_time[4],list_time[5],
+    #                                            list_time[6],list_time[7])
 
+    def change_data(self):
+        day = self.ids.spinner_day.text
+        month = self.ids.spinner_month.text
+        self.date_total_time = day + " " + month
 
-    def check_route_in_dict(self, route) -> list:
-        try:
-            time_in_route = DICT_ROUTE[route]
-            return time_in_route
-        except KeyError:
-            return ["", "", "", ""]
 
     def get_button_smena(self):
         if self.ids.sm_1.state == "down":
@@ -303,7 +324,6 @@ class Page_main(MDScreen):
         else:
             self.ids.create_route.disabled = True
 
-
     def calculation_of_working(self):
         all_time_user_input:list = self.get_all_time_user_input() # возвр все часы\минуты
         if check_value_is_numeric(all_time_user_input):
@@ -356,7 +376,7 @@ class Page_main(MDScreen):
 
 
 class MyPopup_install_time(Popup):
-    Builder.load_file(os.path.join(dir_name, "Popup_install_time.kv"))
+    Builder.load_file(os.path.join(dir_name, "popup_install_time.kv"))
     def __init__(self,route:str,smena:int,install_func,**kwargs):
         Popup.__init__(self, **kwargs)
         self.KEY = route
@@ -423,7 +443,7 @@ class MyPopup_save_new_workday(Popup):
     start_lunch = StringProperty()
     end_lunch = StringProperty()
 
-    Builder.load_file(os.path.join(dir_name, "Popup_new_day.kv"))
+    Builder.load_file(os.path.join(dir_name, "popup_new_day.kv"))
     def __init__(self,date,route,tot_work_time,lst_time, lab,**kwargs):
         Popup.__init__(self, **kwargs)
         self.KEY = date
@@ -462,7 +482,7 @@ class MyPopup_save_new_workday(Popup):
         self.label.text = "Сохранено"
 
 class MyPopup_weekday_or_weekend(Popup):
-    Builder.load_file(os.path.join(dir_name, "Popup_wkd_or_wknd.kv"))
+    Builder.load_file(os.path.join(dir_name, "popup_wkd_or_wknd.kv"))
     def __init__(self, num_route, all_time_new, smena, all_time_route:list["","","",""],lab, **kwargs):
         Popup.__init__(self, **kwargs)
         self.num_route = num_route
@@ -513,7 +533,7 @@ class MyPopup_save_new_route(Popup):
     start_lunch = StringProperty()
     end_lunch = StringProperty()
 
-    Builder.load_file(os.path.join(dir_name, "Popup_new_route.kv"))
+    Builder.load_file(os.path.join(dir_name, "popup_new_route.kv"))
     def __init__(self, route_key, new_array_time, smena:int,lab, **kwargs):
         Popup.__init__(self, **kwargs)
         self.key = route_key
@@ -548,11 +568,52 @@ class MyPopup_save_new_route(Popup):
         self.label_savetext.text_color = "red"
         self.label_savetext.text = "Сохранено"
 
-class Page_stat(MDScreen):
-    Builder.load_file(os.path.join(dir_name,"statistic_page.kv"))
 
-class Page_setting(MDScreen):
-    pass
+
+
+
+
+
+
+class MyPopup_page_stat(Popup):
+    curr_date = StringProperty()
+    title = StringProperty()
+    quant_day = StringProperty()
+    route = StringProperty()
+    karta = StringProperty()
+    tot_hours = StringProperty()
+    tot_min = StringProperty()
+    karta_hours = StringProperty()
+    karta_min = StringProperty()
+    Builder.load_file(os.path.join(dir_name,"popup_statistic.kv"))
+    def __init__(self,title_date, **kwargs):
+        Popup.__init__(self, **kwargs)
+        self.title = title_date.split()[1]
+        self.curr_date = title_date
+        self.tot_hours = "8"
+        self.tot_min = "30"
+        self.install_statistic()
+
+    def install_statistic(self):
+        all_dates = get_all_dates_from_choice_month(self.title)
+        self.quant_day = str(len(all_dates))
+        total_worktime = get_all_worktime(all_dates)
+        self.tot_hours = str(total_worktime[0])
+        self.tot_min = str(total_worktime[1])
+
+        self.route, self.karta = get_karta(self.curr_date)
+        self.karta_hours, self.karta_min = get_karta_worktime(self.curr_date)
+
+
+
+
+
+
+
+
+
+
+
 
 class RouteTextInput(MDTextField):
     def __init__(self, **kwargs):
@@ -695,8 +756,6 @@ class MyApp(MDApp):
         Builder.load_file(os.path.join(dir_name, "main_kv.kv"))
         scm = PagesManager()
         scm.add_widget(Page_main())
-        scm.add_widget(Page_stat())
-        scm.add_widget(Page_setting())
         return scm
 
 
