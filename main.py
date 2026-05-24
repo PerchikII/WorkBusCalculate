@@ -1,15 +1,5 @@
-# class MyList(list):
-#     def __getitem__ (self, offset):
-#         return list.__getitem__ (self, offset - 1)
-
-# class MyTuggButton(ToggleButton):
-#     btn1 = ToggleButton(text='Male', group='sex', pos=(100, 100))
-#     btn2 = ToggleButton(text='Female', group='sex', state='down', pos=(100, 200))
-
-
 import time
 import os
-import datetime
 from datetime import timedelta
 import pickle
 from pprint import pprint
@@ -105,7 +95,7 @@ def exchange_worktime(sec):
     
 def get_all_worktime(all_date):
     all_seconds = timedelta()#timedelta(hours=0, minutes=0)
-    for data in DICT_TIME:
+    for data in all_date:
         hour = int(DICT_TIME[data][1][0])
         minutes = int(DICT_TIME[data][1][1])
         obj_time = timedelta(hours=hour, minutes=minutes)
@@ -249,6 +239,13 @@ class Page_main(MDScreen):
             return 0
         elif self.ids.sm_2.state == "down":
             return 1
+        else:
+            self.ids.sm_2.state = "normal"
+            self.ids.sm_2.font_size = "15sp"
+            self.ids.sm_1.font_size = "35sp"
+            self.ids.sm_1.state = "down"
+            return 0
+
 
     def get_user_choice_date(self):
         day = self.ids["spinner_day"].text
@@ -264,7 +261,11 @@ class Page_main(MDScreen):
                                  self.install_time_in_textinput)
         all_time_user_input: list = self.get_all_time_user_input()  # возвр все часы\минуты
         if check_value_is_numeric(all_time_user_input):
-            self.check_route_input()
+            self.turn_on_button_create_route()
+
+
+
+
 
     def install_time_in_textinput(self, HW_start, MW_start, HW_end, MW_end, HL_start, ML_start, HL_end, ML_end):
         tuple_input_time = ("startworkhours","startworkminutes",
@@ -318,7 +319,7 @@ class Page_main(MDScreen):
         self.total_hours_work = tot_time[0]
         self.total_minutes_work = tot_time[1]
 
-    def check_route_input(self):
+    def turn_on_button_create_route(self):
         if self.get_route_user_choice() != "Не введён":
             self.ids.create_route.disabled = False
         else:
@@ -330,7 +331,7 @@ class Page_main(MDScreen):
             total_time = calculate_work_time(all_time_user_input)
             self.install_total_working_time(total_time)
             self.ids.save_button.disabled = False
-            self.check_route_input()
+            self.turn_on_button_create_route()
         else:
             self.ids.save_button.disabled = True
             self.ids.create_route.disabled = True
@@ -356,11 +357,14 @@ class Page_main(MDScreen):
     def create_route_kart(self):
         num_route:str = self.get_route_user_choice() # Получ.маршрут 102/4
         all_time_route:list = self.get_all_time_user_input() # Получ.время маршрута
-        button_smena = self.get_button_smena()
-        list_time_in_route:list = self.check_route_in_dict(num_route)
+        if int(all_time_route[0]) < 12:
+            smena = 0
+        else:
+            smena = 1
+        list_time_in_route:list = check_route_in_dict(num_route)
         label_savetext = self.ids.savingtext
         """Popup Вопрос: карта выходного или буднего дня"""
-        MyPopup_weekday_or_weekend(num_route,all_time_route,button_smena,list_time_in_route,label_savetext)
+        MyPopup_new_route(num_route,all_time_route,smena,list_time_in_route,label_savetext)
 
 
     def my_callback(self, instance):
@@ -481,8 +485,8 @@ class MyPopup_save_new_workday(Popup):
         self.label.text_color = "red"
         self.label.text = "Сохранено"
 
-class MyPopup_weekday_or_weekend(Popup):
-    Builder.load_file(os.path.join(dir_name, "popup_wkd_or_wknd.kv"))
+class MyPopup_new_route(Popup):
+    Builder.load_file(os.path.join(dir_name, "popup_new_route.kv"))
     def __init__(self, num_route, all_time_new, smena, all_time_route:list["","","",""],lab, **kwargs):
         Popup.__init__(self, **kwargs)
         self.num_route = num_route
@@ -499,7 +503,7 @@ class MyPopup_weekday_or_weekend(Popup):
             save_HDD_DICT(DICT_ROUTE, ROUTE_FILE)
             self.change_save_text_label()
         else:
-            MyPopup_save_new_route(self.num_route, self.all_time_new, self.smena,self.label_savetext)
+            MyPopup_change_route(self.num_route, self.all_time_new, self.smena,self.label_savetext)
 
 
     def weekend(self):
@@ -511,7 +515,7 @@ class MyPopup_weekday_or_weekend(Popup):
             save_HDD_DICT(DICT_ROUTE, ROUTE_FILE)
             self.change_save_text_label()
         else:
-            MyPopup_save_new_route(self.num_route, self.all_time_new, self.smena, self.label_savetext)
+            MyPopup_change_route(self.num_route, self.all_time_new, self.smena, self.label_savetext)
 
 
     def my_callback(self, instance):
@@ -524,7 +528,7 @@ class MyPopup_weekday_or_weekend(Popup):
         self.label_savetext.text_color = "red"
         self.label_savetext.text = "Сохранено"
 
-class MyPopup_save_new_route(Popup):
+class MyPopup_change_route(Popup):
     route_str = StringProperty()
     karta_str = StringProperty()
 
@@ -533,7 +537,7 @@ class MyPopup_save_new_route(Popup):
     start_lunch = StringProperty()
     end_lunch = StringProperty()
 
-    Builder.load_file(os.path.join(dir_name, "popup_new_route.kv"))
+    Builder.load_file(os.path.join(dir_name, "popup_change_route.kv"))
     def __init__(self, route_key, new_array_time, smena:int,lab, **kwargs):
         Popup.__init__(self, **kwargs)
         self.key = route_key
@@ -590,14 +594,14 @@ class MyPopup_page_stat(Popup):
         Popup.__init__(self, **kwargs)
         self.title = title_date.split()[1]
         self.curr_date = title_date
-        self.tot_hours = "8"
-        self.tot_min = "30"
         self.install_statistic()
 
     def install_statistic(self):
         all_dates = get_all_dates_from_choice_month(self.title)
         self.quant_day = str(len(all_dates))
+
         total_worktime = get_all_worktime(all_dates)
+
         self.tot_hours = str(total_worktime[0])
         self.tot_min = str(total_worktime[1])
 
@@ -674,7 +678,7 @@ class HoursTextInput(MDTextField):
         self.temp_lst = ["", ""]
 
     def insert_text(self, value, from_undo=False):
-        if value.isdigit():
+       if value.isdigit():
             if not self.temp_lst[0]:
                 self.temp_lst[0]= value
                 if int(value) < 3:

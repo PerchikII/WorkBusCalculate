@@ -1,77 +1,23 @@
-<MyPopup_save_new_route>:
-    size_hint: (.9,.5)
-    pos_hint: {"x_center": 1,"y": .5}
+<MyPopup_new_route>:
+    size_hint: (.9,.2)
+    pos_hint: {"x_center": 1,"y": .15}
     title: "Внимание!"
     halign: "center"
     title_size: sp(20)
     title_align: "center"
-    separator_color: "red"
+    separator_color: "blue"
     MDBoxLayout:
-        orientation: "vertical"
-        MDBoxLayout:
-            size_hint_y: .2
-            TitleLabel:
-                text: f"Маршрут  [size=20sp][color=#B22222]{root.route_str}[/color][/size]  карта [size=20sp][color=#B22222]{root.karta_str}[/color][/size] существует."
-                halign: "center"
-                color: 1,1,1
-        MDGridLayout:
-            size_hint_y: .2
-            rows:2
-            cols:2
-            TitleLabel:
-                text: "Начало смены"
-                color: 1,1,0
-            TitleLabel:
-                text: "Конец смены"
-                color: 1,1,0
-            TitleLabel:
-                text: root.start_work
-                color: 1,1,1
-                role: "large"
-            TitleLabel:
-                text: root.end_work
-                color: 1,1,1
-                role: "large"
-        MDBoxLayout:
-            size_hint_y: .1
-            TitleLabel:
-                text: "Перерыв"
-                color: 1,1,0
-        MDGridLayout:
-            size_hint_y: .2
-            rows: 1
-            cols: 3
-            TitleLabel:
-                text: root.start_lunch
-                color: 1,1,1
-                halign: "right"
-                role: "large"
-            TitleLabel:
-                size_hint_x: .1
-                text: "-"
-                color: 1,1,1
-                role: "large"
-            TitleLabel:
-                text: root.end_lunch
-                color: 1,1,1
-                halign: "left"
-                role: "large"
-        MDBoxLayout:
-            size_hint_y: .1
-            TitleLabel:
-                text: "Заменить?"
-                color: 1,0,0
-
-        MDBoxLayout:
-            size_hint_y: .2
-            spacing: dp(10)
-            Button_main:
-                on_release: root.answer_ok()
-                Button_text:
-                    pos_hint: {"center_x": .5,"center_y": .5}
-                    text: "Сохранить"
-            Button_main:
-                on_release: root.dismiss()
-                Button_text:
-                    pos_hint: {"center_x": .5,"center_y": .5}
-                    text: "Отмена"
+        Button_main:
+            on_release:
+                root.weekday()
+                root.dismiss()
+            Button_text:
+                pos_hint: {"center_x": .5,"center_y": .5}
+                text: "Будний день"
+        Button_main:
+            on_release:
+                root.weekend()
+                root.dismiss()
+            Button_text:
+                pos_hint: {"center_x": .5,"center_y": .5}
+                text: "Выходной"
