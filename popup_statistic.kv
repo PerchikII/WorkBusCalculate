@@ -1,5 +1,5 @@
 <MyPopup_page_stat>:
-    size_hint: (.9,.7)
+    size_hint: (.9,.6)
     title: "Внимание!"
     halign: "center"
     title_size: sp(30)
@@ -34,21 +34,20 @@
                     MDBoxLayout:
                         TitleLabel:
                             role: "large"
-                            text: f"[color=#A52A2A]{root.tot_hours}[/color] часов"
+                            text: f"[color=#A52A2A]{root.tot_hours}[/color]  часов"
                         TitleLabel:
                             role: "large"
-                            text: f"[color=#A52A2A]{root.tot_min}[/color] минут"
+                            text: f"[color=#A52A2A]{root.tot_min}[/color]  минут"
             MDDivider:
                 pos_hint: {'center_x': .5, 'center_y': .5}
                 size_hint_x: .5
-                size_hint_y: .0000001
                 theme_divider_color: "Custom"
                 color: 0,0,0
                 halign: "center"
 
             MDBoxLayout:
                 orientation: "vertical"
-                size_hint_y: .65
+                size_hint_y: .45
                 padding: (dp(5),0,dp(5),0)
                 MDBoxLayout:
                     TitleLabel:
@@ -62,35 +61,26 @@
                     TitleLabel:
                         text: f" номер [size=20sp][color=#A52A2A]{root.route}[/color][/size]   карта [size=20sp][color=#A52A2A]{root.karta}[/color][/size]"
 
-
                 MDBoxLayout:
                     #size_hint_y: .4
                     TitleLabel:
-                        text: "Отработка составила:"
+                        text: "Отработано:"
                 MDBoxLayout:
                     #size_hint_y: .4
                     TitleLabel:
                         text: f"[size=20sp][color=#A52A2A]{root.karta_hours}[/color][/size]   часов   [size=20sp][color=#A52A2A]{root.karta_min}[/color][/size]   минут"
 
             MDBoxLayout:
-                # md_bg_color: 0,0,0,1
                 size_hint_y: .2
-                Button:
-                # Button_main:
+                Button_main:
                     on_release: root.dismiss()
-                    # color: 1,0,0,1
-                    bg_color: .1,.1,1,1
-                    pos_hint: {"center_x": .5,"center_y": .5}
-                    text: "Закрыть"
-                    halign: "center"
-                    valign: "center"
-                    color: 0,1,.1,1
-#                    Button_text:
-#                        pos_hint: {"center_x": .5,"center_y": .5}
-#                        text: "Закрыть"
-#                        halign: "center"
-#                        valign: "center"
-#                        text_color: 0,0,.1,1
+                    color: 1,0,0,.1
+                    Button_text:
+                        pos_hint: {"center_x": .5,"center_y": .5}
+                        text: "Закрыть"
+                        halign: "center"
+                        valign: "center"
+                        text_color: 1,1,1
 
 
 

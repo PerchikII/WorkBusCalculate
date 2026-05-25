@@ -634,7 +634,7 @@ class RouteTextInput(MDTextField):
         if args:
             self.parent.md_bg_color = "greenyellow"
             self.text = ""
-            self.font_size = "25dp"
+            self.font_size = "35dp"
         else:
             if not self.text:
                 self.parent.md_bg_color = self.parent_color
@@ -657,7 +657,7 @@ class KartaTextInput(MDTextField):
         if args:
             self.parent.md_bg_color = "greenyellow"
             self.text = ""
-            self.font_size = "25dp"
+            self.font_size = "35dp"
         else:
             if not self.text:
                 self.parent.md_bg_color = self.parent_color

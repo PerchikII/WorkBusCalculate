@@ -26,7 +26,7 @@
 
 <TimeBox@MDBoxLayout>
     orientation: "vertical"
-    padding: 5
+    padding: dp(5)
     canvas.before:
         Color:
             rgba: 0,0,0,1
@@ -61,14 +61,14 @@
         size: root.size
         MDBoxLayout:
             id: TOP_box
-            padding: [sp(10),sp(10),sp(10),0]
+            padding: [dp(10),dp(10),dp(10),0]
             size_hint_y: .8
             MDBoxLayout:
                 id:left_box
                 orientation: "vertical"
                 MDBoxLayout:
                     size_hint_y: .2
-                    padding: [0,0,sp(5),sp(5)]
+                    padding: [0,0,dp(5),dp(5)]
                     orientation: "vertical"
                     MDBoxLayout:
                         size_hint_y: .6
@@ -243,7 +243,7 @@
 
 
                 TimeBox:
-                    padding: 5
+                    padding: dp(5)
                     MDBoxLayout:
                         TitleLabel:
                             text: "  Установите\n [color=#A52A2A]НАЧАЛО перерыва[/color]"
@@ -267,7 +267,7 @@
 
 
                 TimeBox:
-                    padding: 5
+                    padding: dp(5)
                     orientation: "vertical"
                     MDBoxLayout:
                         TitleLabel:
@@ -291,8 +291,8 @@
                                 on_text: root.calculation_of_working()
 
                 TimeBox:
-                    padding: 5
-                    spacing: 10
+                    padding: dp(5)
+                    spacing: dp(10)
                     orientation: "vertical"
                     MDBoxLayout:
                         Button_main:
@@ -325,14 +325,14 @@
 
         MDBoxLayout:
             id: BOTTOM_box
-            padding: [sp(10),sp(10),sp(10),0]
+            padding: [dp(10),dp(10),dp(10),0]
             orientation: "vertical"
             size_hint_y: .15
             MDBoxLayout:
                 size_hint_y: .40
-                padding:[0,0,0,sp(5)]
+                padding:[0,0,0,dp(5)]
                 MDBoxLayout:
-                    padding:[0,0,sp(10),0]
+                    padding:[0,0,dp(10),0]
                     Button_main:
                         id: save_button
                         on_release: root.intercept_and_save_alldata()
@@ -351,9 +351,9 @@
                         Button_text:
                             pos_hint: {"right": .7,"center_y": .5}
                             text: "Выход"
+
             MDBoxLayout:
                 size_hint:(1,.1)
-                # padding: sp(5)
                 TitleLabel:
                     markup: True
                     text: "автор: Погодаев Илья Сергеевич [color=#0B0080][b]ilya1880@mail.ru[/b][/color]"
