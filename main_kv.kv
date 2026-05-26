@@ -199,18 +199,26 @@
                             RouteTextInput:
                                 parent_color: app.theme_cls.primaryContainerColor
                                 id: route_number_textinput
+                                size_hint_y: 1
+                                halign: "center"
+                                bold: True
+                                theme_text_color: "Custom"
+                                text_color_normal: "black"
                                 mode: "outlined"
                                 multiline: False
-                                # text_color_normal: "black"
                                 on_text: root.search_rout_in_dict()
 
                         MDBoxLayout:
                             KartaTextInput:
                                 parent_color: app.theme_cls.primaryContainerColor
                                 id: karta_route_number_textinput
+                                size_hint_y: 1
+                                halign: "center"
+                                bold: True
+                                theme_text_color: "Custom"
+                                text_color_normal: "black"
                                 mode: "outlined"
                                 multiline: False
-                                # text_color_normal: "black"
                                 on_text: root.search_rout_in_dict()
 
                     TimeBox:
@@ -296,7 +304,7 @@
                     orientation: "vertical"
                     MDBoxLayout:
                         Button_main:
-                            on_release: root.show_DICT();root.show_statistic()#
+                            on_release: root.show_statistic() # root.show_DICT();
                             Button_text:
                                 # text_size: self.size
                                 pos_hint: {"center_x": .5,"center_y": .5}

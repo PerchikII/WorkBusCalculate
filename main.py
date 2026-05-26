@@ -1,12 +1,10 @@
 import time
 import os
+from sys import exit as sysexit
 from datetime import timedelta
 import pickle
-from pprint import pprint
+# from pprint import pprint
 
-from sys import platform
-if platform == "win32":
-    os.environ["KCFG_GRAPHICS_BORDERLESS"] = "0"
 
 from kivymd.app import MDApp
 from kivy.uix.popup import Popup
@@ -16,8 +14,7 @@ from kivymd.uix.textfield import MDTextField
 from kivy.lang.builder import Builder
 from kivy.properties import ListProperty, StringProperty
 from kivy.clock import Clock
-
-
+from kivy.core.window import Window
 
 WORK_TIME_FILE = "worktime_data.dat"
 ROUTE_FILE = "routes_data.dat"
@@ -52,20 +49,12 @@ DICT_ROUTE = load_HDDfile(ROUTE_FILE)
 
 
 
-print("DICT_TIME_STATISTIC############")
-pprint(DICT_TIME)
-print("+++++++++++++++++++++++++++++++++")
-print("DICT_ROUTE ####################")
-pprint(DICT_ROUTE)
-print("+++++++++++++++++++++++++++++++++")
-
-
-
-
-
-
-
-
+# print("DICT_TIME_STATISTIC############")
+# pprint(DICT_TIME)
+# print("+++++++++++++++++++++++++++++++++")
+# print("DICT_ROUTE ####################")
+# pprint(DICT_ROUTE)
+# print("+++++++++++++++++++++++++++++++++")
 
 month_lst = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
              'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь']
@@ -81,8 +70,7 @@ else:
 number_month = int(time.strftime("%m", time_day))
 CURRENT_MONTH = month_lst[number_month - 1]
 
-class PagesManager(MDScreenManager):
-   pass
+
 
 def exchange_worktime(sec):
     td = timedelta(seconds=sec)    
@@ -135,7 +123,7 @@ def calculate_work_time(time_args:(tuple,list))->str :
     time_end_work = timedelta(hours=Hour_end_work, minutes=Min_end_work)
 
     time_work_str = str((time_end_work - time_start_work) - difference_time_lunch)
-    total_time_work = time_work_str.split()[-1]
+    total_time_work = time_work_str.split()[-1] # time_work_str [-1 day, 23:00:00]
     return total_time_work
 
 def check_value_is_numeric(value:(tuple,list))->bool:
@@ -165,7 +153,6 @@ def get_karta(day):
         route_and_karta = DICT_TIME[day][0].split("/")
         return route_and_karta[0],route_and_karta[1],
     except (KeyError,IndexError):
-        print("KEYERROR")
         return "Не введён", ""
 
 def get_karta_worktime(day):
@@ -175,10 +162,18 @@ def get_karta_worktime(day):
     except KeyError:
         return "",""
 
+def key_input(window, key, scancode, codepoint, modifier):
+    if key == 27:
+        sysexit()
 
 ################################################################################
 ################################################################################
 ################################################################################
+
+class PagesManager(MDScreenManager):
+    Window.bind(on_keyboard=key_input)
+
+
 
 class Page_main(MDScreen):
     """Читай переменные. Их имена обо всём говорят."""
@@ -196,37 +191,17 @@ class Page_main(MDScreen):
 
     def __init__(self, **kwargs):
         MDScreen.__init__(self, **kwargs)
-    @staticmethod
-    def show_DICT():
-        print("DICT_TIME #########################################")
-        pprint(DICT_TIME)
-        print("DICT_ROUTE_WKDAY #########################################")
-        pprint(DICT_ROUTE)
-        print("+++++++++++++++++++++++++++++++++")
+    # @staticmethod
+    # def show_DICT():
+    #     print("DICT_TIME #########################################")
+    #     pprint(DICT_TIME)
+    #     print("DICT_ROUTE_WKDAY #########################################")
+    #     pprint(DICT_ROUTE)
+    #     print("+++++++++++++++++++++++++++++++++")
 
     def show_statistic(self):
         current_date = self.get_user_choice_date()
         MyPopup_page_stat(current_date).open()
-
-    # def search_workday(self):
-    #     DATA = self.get_user_choice_date()
-    #     if DATA in DICT_TIME:
-    #         try:
-    #             route,karta = DICT_TIME[DATA][0].split("/")
-    #             self.ids.route_number_textinput.font_size = "25dp"
-    #             self.ids.karta_route_number_textinput.font_size = "25dp"
-    #             self.ids.route_number_textinput.text = route
-    #             self.ids.karta_route_number_textinput.text = karta
-    #         except ValueError:
-    #             self.ids.route_number_textinput.font_size = "15dp"
-    #             self.ids.route_number_textinput.text = "Маршрут"
-    #             self.ids.karta_route_number_textinput.font_size = "18dp"
-    #             self.ids.karta_route_number_textinput.text = "Карта"
-    #             list_time:list = DICT_TIME[DATA][2]
-    #             self.install_time_in_textinput(list_time[0],list_time[1],
-    #                                            list_time[2],list_time[3],
-    #                                            list_time[4],list_time[5],
-    #                                            list_time[6],list_time[7])
 
     def change_data(self):
         day = self.ids.spinner_day.text
@@ -263,17 +238,13 @@ class Page_main(MDScreen):
         if check_value_is_numeric(all_time_user_input):
             self.turn_on_button_create_route()
 
-
-
-
-
     def install_time_in_textinput(self, HW_start, MW_start, HW_end, MW_end, HL_start, ML_start, HL_end, ML_end):
         tuple_input_time = ("startworkhours","startworkminutes",
                             "hoursendwork","minutesendwork",
                             "hoursstartlunch","minutesstartlunch",
                             "hoursendlunch","minutesendlunch")
         for textinput_name in tuple_input_time:
-            self.ids[textinput_name].font_size = "30dp"
+            self.ids[textinput_name].font_size = "30sp"
             self.ids[textinput_name].bold = True
             self.ids[textinput_name].text_color_normal = (1,0,0)
 
@@ -473,9 +444,9 @@ class MyPopup_save_new_workday(Popup):
         save_HDD_DICT(DICT_TIME, WORK_TIME_FILE)
         self.change_save_text_label()
         self.dismiss()
-        pprint(DICT_TIME)
 
-    def my_callback(self, instance):
+
+    def my_callback(self, ins):
         self.label.text_color = "black"
         self.label.text = "Отработано:"
         return False
@@ -518,7 +489,7 @@ class MyPopup_new_route(Popup):
             MyPopup_change_route(self.num_route, self.all_time_new, self.smena, self.label_savetext)
 
 
-    def my_callback(self, instance):
+    def my_callback(self, ins):
         self.label_savetext.text_color = "black"
         self.label_savetext.text = "Отработано:"
         return False
@@ -572,13 +543,6 @@ class MyPopup_change_route(Popup):
         self.label_savetext.text_color = "red"
         self.label_savetext.text = "Сохранено"
 
-
-
-
-
-
-
-
 class MyPopup_page_stat(Popup):
     curr_date = StringProperty()
     title = StringProperty()
@@ -599,33 +563,15 @@ class MyPopup_page_stat(Popup):
     def install_statistic(self):
         all_dates = get_all_dates_from_choice_month(self.title)
         self.quant_day = str(len(all_dates))
-
         total_worktime = get_all_worktime(all_dates)
-
         self.tot_hours = str(total_worktime[0])
         self.tot_min = str(total_worktime[1])
-
         self.route, self.karta = get_karta(self.curr_date)
         self.karta_hours, self.karta_min = get_karta_worktime(self.curr_date)
-
-
-
-
-
-
-
-
-
-
-
 
 class RouteTextInput(MDTextField):
     def __init__(self, **kwargs):
         MDTextField.__init__(self, **kwargs)
-        self.halign = "center"
-        self.bold = True
-        self.theme_text_color = "Custom"
-        self.text_color_normal = "black"
     def insert_text(self, value, from_undo=False):
         if value.isdigit():
             if len(self.text) < 3:
@@ -634,21 +580,16 @@ class RouteTextInput(MDTextField):
         if args:
             self.parent.md_bg_color = "greenyellow"
             self.text = ""
-            self.font_size = "35dp"
+            self.font_size = "35sp"
         else:
             if not self.text:
                 self.parent.md_bg_color = self.parent_color
-                self.font_size = "15dp"
+                self.font_size = "15sp"
                 self.text = "Маршрут"
 
 class KartaTextInput(MDTextField):
     def __init__(self, **kwargs):
         MDTextField.__init__(self, **kwargs)
-        self.halign = "center"
-        self.bold = True
-        self.theme_text_color = "Custom"
-        self.text_color_normal = "black"
-
     def insert_text(self, value, from_undo=False):
         if value.isdigit():
             if len(self.text) < 2:
@@ -657,11 +598,11 @@ class KartaTextInput(MDTextField):
         if args:
             self.parent.md_bg_color = "greenyellow"
             self.text = ""
-            self.font_size = "35dp"
+            self.font_size = "35sp"
         else:
             if not self.text:
                 self.parent.md_bg_color = self.parent_color
-                self.font_size = "18dp"
+                self.font_size = "18sp"
                 self.text = "Карта"
 
 class HoursTextInput(MDTextField):
@@ -672,42 +613,35 @@ class HoursTextInput(MDTextField):
         self.halign = "center"
         self.bold = True
         self.theme_text_color = "Custom"
-        self.temp_lst = ["", ""]
+
+
     def do_backspace(self, from_undo=False, mode='bkspc'):
         self.text = ""
-        self.temp_lst = ["", ""]
-
     def insert_text(self, value, from_undo=False):
-       if value.isdigit():
-            if not self.temp_lst[0]:
-                self.temp_lst[0]= value
-                if int(value) < 3:
-                    if len(self.text) < 2:
+        if value.isdigit():
+            if len(self.text) < 2:
+                if len(self.text) == 0:
+                    if int(value) >= 3:
+                       return super().insert_text("0"+value, from_undo=from_undo)
+                    elif int(value) < 3:
+                       return super().insert_text(value, from_undo=from_undo)
+                elif len(self.text) > 0:
+                    if self.text == "1":
                         return super().insert_text(value, from_undo=from_undo)
-                else:
-                    self.temp_lst = ["", ""]
-            else:
-                self.temp_lst[1] = value
-                if self.temp_lst[0] == "2":
-                    if int(value) < 4:
-                        if len(self.text) < 2:
-                            self.temp_lst = ["", ""]
-                            return super().insert_text(value, from_undo=from_undo)
-                else:
-                    if len(self.text) < 2:
+                    elif self.text == "2" and int(value) < 5:
                         return super().insert_text(value, from_undo=from_undo)
+
     def on_focus(self, inst, args):
         if args:
-            self.temp_lst = ["", ""]
             self.text_color_normal = "black"
             self.parent.md_bg_color = "greenyellow"
             self.text = ""
-            self.font_size = "30dp"
+            self.font_size = "30sp"
         else:
             if not self.text:
                 self.text_color_normal = "black"
                 self.parent.md_bg_color = self.parent_color
-                self.font_size = "20dp"
+                self.font_size = "20sp"
                 self.text = "Час"
 
 class MinutesTextInput(MDTextField):
@@ -718,38 +652,32 @@ class MinutesTextInput(MDTextField):
         self.halign = "center"
         self.bold = True
         self.theme_text_color = "Custom"
-        self.temp_lst = ["", ""]
+
     def do_backspace(self, from_undo=False, mode='bkspc'):
         self.text = ""
-        self.temp_lst = ["", ""]
 
     def insert_text(self, value, from_undo=False):
         if value.isdigit():
-            if not self.temp_lst[0]:
-                self.temp_lst[0] = value
-                if int(value) < 6:
-                    if len(self.text) < 2:
-                        return super().insert_text(value, from_undo=from_undo)
-                else:
-                    self.temp_lst = ["", ""]
-            else:
-                self.temp_lst[1] = value
-                if len(self.text) < 2:
-                    self.temp_lst = ["", ""]
+            if len(self.text) < 2:
+                if len(self.text) == 0:
+                    if int(value) < 6:
+                       return super().insert_text(value, from_undo=from_undo)
+                elif len(self.text) == 1:
                     return super().insert_text(value, from_undo=from_undo)
+
+
 
     def on_focus(self, inst, args):
         if args:
-            self.temp_lst = ["", ""]
             self.text_color_normal = "black"
             self.parent.md_bg_color = "greenyellow"
             self.text = ""
-            self.font_size = "30dp"
+            self.font_size = "30sp"
         else:
             if not self.text:
                 self.text_color_normal = "black"
                 self.parent.md_bg_color = self.parent_color
-                self.font_size = "18dp"
+                self.font_size = "18sp"
                 self.text = "Мин"
 
 class MyApp(MDApp):
