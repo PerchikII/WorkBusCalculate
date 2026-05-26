@@ -628,7 +628,7 @@ class HoursTextInput(MDTextField):
                 elif len(self.text) > 0:
                     if self.text == "1":
                         return super().insert_text(value, from_undo=from_undo)
-                    elif self.text == "2" and int(value) < 5:
+                    elif self.text == "2" and int(value) < 4:
                         return super().insert_text(value, from_undo=from_undo)
 
     def on_focus(self, inst, args):
@@ -661,7 +661,9 @@ class MinutesTextInput(MDTextField):
             if len(self.text) < 2:
                 if len(self.text) == 0:
                     if int(value) < 6:
-                       return super().insert_text(value, from_undo=from_undo)
+                        return super().insert_text(value, from_undo=from_undo)
+                    elif int(value) > 5:
+                        return super().insert_text("0" + value, from_undo=from_undo)
                 elif len(self.text) == 1:
                     return super().insert_text(value, from_undo=from_undo)
 
