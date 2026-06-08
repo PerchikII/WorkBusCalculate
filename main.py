@@ -3,18 +3,21 @@ import os
 from sys import exit as sysexit
 from datetime import timedelta
 import pickle
-# from pprint import pprint
+from pprint import pprint
 
 
 from kivymd.app import MDApp
 from kivy.uix.popup import Popup
 from kivymd.uix.screenmanager import MDScreenManager
+from kivy.uix.screenmanager import SlideTransition
 from kivymd.uix.screen import MDScreen
 from kivymd.uix.textfield import MDTextField
 from kivy.lang.builder import Builder
 from kivy.properties import ListProperty, StringProperty
 from kivy.clock import Clock
 from kivy.core.window import Window
+
+from kivy.uix.modalview import ModalView
 
 WORK_TIME_FILE = "worktime_data.dat"
 ROUTE_FILE = "routes_data.dat"
@@ -42,17 +45,13 @@ def save_HDD_DICT(dictionary:dict, name_file:str):
     with open(os.path.join(dir_name,name_file), 'wb') as file:
         pickle.dump(dictionary, file)
 
-
-
 DICT_TIME = load_HDDfile(WORK_TIME_FILE)
 DICT_ROUTE = load_HDDfile(ROUTE_FILE)
 
-
-
-# print("DICT_TIME_STATISTIC############")
+# print(####### "DICT_TIME ############")
 # pprint(DICT_TIME)
 # print("+++++++++++++++++++++++++++++++++")
-# print("DICT_ROUTE ####################")
+# print(####### "DICT_ROUTE #############")
 # pprint(DICT_ROUTE)
 # print("+++++++++++++++++++++++++++++++++")
 
@@ -70,8 +69,6 @@ else:
 number_month = int(time.strftime("%m", time_day))
 CURRENT_MONTH = month_lst[number_month - 1]
 
-
-
 def exchange_worktime(sec):
     td = timedelta(seconds=sec)    
     hours, remainder = divmod(td.seconds, 3600)
@@ -79,7 +76,6 @@ def exchange_worktime(sec):
     if td.days > 0:
         hours = hours + td.days * 24
     return hours,minutes
-    
     
 def get_all_worktime(all_date):
     all_seconds = timedelta()#timedelta(hours=0, minutes=0)
@@ -98,7 +94,6 @@ def get_all_dates_from_choice_month(choice_month) -> list:
         if i.split()[1] == choice_month:  # Определяем нужный месяц из списка. Вычленяем название месяца
             list_month.append(i)  # Записываем в список только даты с нужным месяцем
     return list_month
-
 
 def checking_the_time(hours,minutes):
     if hours.isdigit() and minutes.isdigit():
@@ -141,13 +136,6 @@ def get_route(route_str:str):
         route, karta = "Не введён", ""
         return route, karta
 
-def check_route_in_dict(route) -> list:
-    try:
-        time_in_route = DICT_ROUTE[route]
-        return time_in_route
-    except KeyError:
-        return ["", "", "", ""]
-
 def get_karta(day):
     try:
         route_and_karta = DICT_TIME[day][0].split("/")
@@ -171,7 +159,47 @@ def key_input(window, key, scancode, codepoint, modifier):
 ################################################################################
 
 class PagesManager(MDScreenManager):
-    Window.bind(on_keyboard=key_input)
+    def __init__(self, **kwargs):
+        MDScreenManager.__init__(self, **kwargs)
+        Window.bind(on_keyboard=key_input)
+        self.tap_Y_Down = None
+        self.tap_Y_Up = None
+
+    def on_touch_down(self, touch):
+        self.tap_Y_Down = touch.y
+        return super(PagesManager, self).on_touch_down(touch)
+
+    def on_touch_up(self, touch):
+        self.tap_Y_Up = touch.y
+        if (self.tap_Y_Up - self.tap_Y_Down) > 150:
+            self.transition = SlideTransition()
+            self.transition.direction = "up"
+            self.current = "main_page"
+        return super(PagesManager, self).on_touch_up(touch)
+
+
+
+
+class MyView(ModalView):
+    # Builder.load_file(os.path.join(dir_name, "modalView.kv"))
+    def __init__(self, **kwargs):
+        ModalView.__init__(self, **kwargs)
+        self.border_y = 1
+        self.pos_hint = {"center": 1, "y": self.border_y}
+
+
+    def on_open(self):
+        Clock.schedule_interval(self.my_callback, .001)
+
+    def my_callback(self,arg):
+        self.pos_hint = {"center": 1, "y": self.border_y}
+        self.border_y -= .005
+        print(self.border_y)
+        if self.border_y < .5:
+            return False
+
+
+
 
 
 
@@ -191,13 +219,9 @@ class Page_main(MDScreen):
 
     def __init__(self, **kwargs):
         MDScreen.__init__(self, **kwargs)
-    # @staticmethod
-    # def show_DICT():
-    #     print("DICT_TIME #########################################")
-    #     pprint(DICT_TIME)
-    #     print("DICT_ROUTE_WKDAY #########################################")
-    #     pprint(DICT_ROUTE)
-    #     print("+++++++++++++++++++++++++++++++++")
+
+    def MyV(self):
+        MyView().open()
 
     def show_statistic(self):
         current_date = self.get_user_choice_date()
@@ -332,7 +356,7 @@ class Page_main(MDScreen):
             smena = 0
         else:
             smena = 1
-        list_time_in_route:list = check_route_in_dict(num_route)
+        list_time_in_route:list = DICT_ROUTE.get(num_route,["","","",""])
         label_savetext = self.ids.savingtext
         """Popup Вопрос: карта выходного или буднего дня"""
         MyPopup_new_route(num_route,all_time_route,smena,list_time_in_route,label_savetext)
@@ -348,6 +372,9 @@ class Page_main(MDScreen):
         # self.label.theme_text_color = "Custom"
         self.ids.savingtext.text_color = "red"
         self.ids.savingtext.text = "Сохранено"
+
+class Page_route(MDScreen):
+    Builder.load_file(os.path.join(dir_name, "page_route_kv.kv"))
 
 
 class MyPopup_install_time(Popup):
@@ -690,6 +717,8 @@ class MyApp(MDApp):
         Builder.load_file(os.path.join(dir_name, "main_kv.kv"))
         scm = PagesManager()
         scm.add_widget(Page_main())
+        scm.add_widget(Page_route())
+
         return scm
 
 
