@@ -4,10 +4,15 @@ from sys import exit as sysexit
 from datetime import timedelta
 import pickle
 from pprint import pprint
+from math import ceil
+
+
+from kivy.uix.button import Button
 
 
 from kivymd.app import MDApp
 from kivy.uix.popup import Popup
+from kivymd.uix.gridlayout import MDGridLayout
 from kivymd.uix.screenmanager import MDScreenManager
 from kivy.uix.screenmanager import SlideTransition
 from kivymd.uix.screen import MDScreen
@@ -51,9 +56,9 @@ DICT_ROUTE = load_HDDfile(ROUTE_FILE)
 # print(####### "DICT_TIME ############")
 # pprint(DICT_TIME)
 # print("+++++++++++++++++++++++++++++++++")
-# print(####### "DICT_ROUTE #############")
-# pprint(DICT_ROUTE)
-# print("+++++++++++++++++++++++++++++++++")
+print("####### DICT_ROUTE #############")
+pprint(DICT_ROUTE)
+print("+++++++++++++++++++++++++++++++++")
 
 month_lst = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
              'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь']
@@ -68,6 +73,14 @@ else:
 
 number_month = int(time.strftime("%m", time_day))
 CURRENT_MONTH = month_lst[number_month - 1]
+
+def get_set_all_route()->list:
+    set_route = []
+    for route in DICT_ROUTE:
+        set_route.append(route.split("/")[0])
+    set_route = sorted(set(set_route),key=int)
+    lst = list(range(1,22))
+    return  lst  # set_route
 
 def exchange_worktime(sec):
     td = timedelta(seconds=sec)    
@@ -178,24 +191,52 @@ class PagesManager(MDScreenManager):
         return super(PagesManager, self).on_touch_up(touch)
 
 
+class Grid_for_MyView(MDGridLayout):
+    def __init__(self, **kwargs):
+        MDGridLayout.__init__(self, **kwargs)
+        self.cols = 5
+        self.list_routs:list = get_set_all_route()
+        self.set_butt_routs()
+    def set_butt_routs(self):
+        for i in self.list_routs:
+            my_route_Button = Button(text=str(i),
+                                     bold=True,
+                                     color="white",
+                                     halign="center",
+                                     valign="center",
+                                     font_size="20sp")
+            my_route_Button.bind(on_press=self.func)
+            self.add_widget(my_route_Button)
+
+    def func(self,instance):
+        print("ok",instance.text)
+
 
 
 class MyView(ModalView):
-    # Builder.load_file(os.path.join(dir_name, "modalView.kv"))
+    Builder.load_file(os.path.join(dir_name, "modalView.kv"))
     def __init__(self, **kwargs):
         ModalView.__init__(self, **kwargs)
+        self.set_route: list = get_set_all_route()
         self.border_y = 1
+        self.size_hint_y = self.set_height_y_label()
+        print(self.size)
         self.pos_hint = {"center": 1, "y": self.border_y}
+
+
+    def set_height_y_label(self):
+        return ((ceil(len(self.set_route) / 5))+1) /10
+
 
 
     def on_open(self):
-        Clock.schedule_interval(self.my_callback, .001)
+        Clock.schedule_interval(self.my_callback, .1)
 
     def my_callback(self,arg):
         self.pos_hint = {"center": 1, "y": self.border_y}
-        self.border_y -= .005
-        print(self.border_y)
-        if self.border_y < .5:
+        self.border_y -= .05
+        print(self.size,"mycallback")
+        if self.border_y < .35:
             return False
 
 

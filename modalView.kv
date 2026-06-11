@@ -1,0 +1,22 @@
+<MyView>:
+    MDBoxLayout:
+        orientation: "vertical"
+        padding: dp(10)
+        spacing: dp(5)
+        Grid_for_MyView:
+            padding: [dp(20),dp(10),0,0]
+            spacing: dp(10)
+            col_force_default: True
+            row_force_default: True
+            col_default_width: sp(45)
+            row_default_height: sp(45)
+            size_hint_y: .7
+
+
+        MDBoxLayout:
+            size_hint_y: .3
+            TitleLabel:
+                text: "[color=#E0FFFF]Записанные маршруты[/color]"
+                role: "medium"
+
+
