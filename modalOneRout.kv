@@ -1,0 +1,34 @@
+<ModalViewOneRout>:
+    MDBoxLayout:
+        md_bg_color: "black"
+        orientation: "vertical"
+        MDBoxLayout:
+            size_hint_y: .07
+            MDBoxLayout:
+                md_bg_color: "red"
+                TitleLabel:
+                    text: "Будние"
+                    color: "white"
+            MDBoxLayout:
+                md_bg_color: "green"
+                TitleLabel:
+                    font_style: "Display"
+                    role: "small"
+                    text: root.num_rout
+                    color: "white"
+                    valign: "top" # ?????????????????????????????????????????
+            MDBoxLayout:
+                md_bg_color: "blue"
+                TitleLabel:
+                    text: "Выходные"
+                    color: "white"
+        MDDivider:
+            size_hint_x: 1
+            theme_divider_color: "Custom"
+            color: 1,1,1
+
+        MDBoxLayout:
+            orientation: "vertical"
+            id: main_box_time
+            size_hint_y: 1
+
