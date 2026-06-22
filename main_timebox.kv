@@ -21,10 +21,16 @@
             orientation: "vertical"
             MDBoxLayout:
                 TimeLabel:
-                    text: f"1   {root.start_hours_day_1sm}:{root.start_minutes_day_1sm} - {root.finish_hours_day_1sm}:{root.finish_minutes_day_1sm}"
+                    size_hint_x: .1
+                    text: "1"
+                TimeLabel:
+                    text: f"{root.start_hours_day_1sm}:{root.start_minutes_day_1sm} - {root.finish_hours_day_1sm}:{root.finish_minutes_day_1sm}"
             MDBoxLayout:
                 TimeLabel:
-                    text: f"2   {root.start_hours_day_2sm}:{root.start_minutes_day_2sm} - {root.finish_hours_day_2sm}:{root.finish_minutes_day_2sm}"
+                    size_hint_x: .1
+                    text: "2"
+                TimeLabel:
+                    text: f"{root.start_hours_day_2sm}:{root.start_minutes_day_2sm} - {root.finish_hours_day_2sm}:{root.finish_minutes_day_2sm}"
         MDBoxLayout:
             size_hint_x: .2
             TimeLabel:
@@ -36,10 +42,16 @@
             orientation: "vertical"
             MDBoxLayout:
                 TimeLabel:
-                    text: f"1   {root.start_hours_end_1sm}:{root.start_minutes_end_1sm} - {root.finish_hours_end_1sm}:{root.finish_minutes_end_1sm}"
+                    size_hint_x: .1
+                    text: "1"
+                TimeLabel:
+                    text: f"{root.start_hours_end_1sm}:{root.start_minutes_end_1sm} - {root.finish_hours_end_1sm}:{root.finish_minutes_end_1sm}"
             MDBoxLayout:
                 TimeLabel:
-                    text: f"2   {root.start_hours_end_2sm}:{root.start_minutes_end_2sm} - {root.finish_hours_end_2sm}:{root.finish_minutes_end_2sm}"
+                    size_hint_x: .1
+                    text: "2"
+                TimeLabel:
+                    text: f"{root.start_hours_end_2sm}:{root.start_minutes_end_2sm} - {root.finish_hours_end_2sm}:{root.finish_minutes_end_2sm}"
 
     MDDivider:
         size_hint_x: 1

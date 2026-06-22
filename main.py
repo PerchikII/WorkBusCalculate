@@ -235,6 +235,7 @@ class Timebox_main(MDScreen):
     start_minutes_end_2sm = StringProperty("-")
     finish_hours_end_2sm = StringProperty("-")
     finish_minutes_end_2sm = StringProperty("-")
+
     Builder.load_file(os.path.join(dir_name, "main_timebox.kv"))
     def __init__(self,choice_rout:str, **kwargs):
         MDScreen.__init__(self, **kwargs)
@@ -323,14 +324,25 @@ class ModalViewOneRout(ModalView):
     def on_open(self):
         Clock.schedule_interval(self.my_open_callback, .05)
 
-    def my_open_callback(self, arg):
+    def my_open_callback(self, t):
         self.pos_hint = {"center": 1, "y": self.border_y}
         self.border_y -= .05
         if self.border_y < -.01:
             return False
+##########################################################
+    ###################################################
+
+    def my_close_callback(self,t):
+        self.pos_hint = {"center": 1, "y": self.border_y}
+        self.border_y += .05
+        if self.border_y > 1:
+            self.dismiss()
+            return False
+
 
     def on_touch_up(self, touch):
-        self.dismiss()
+        Clock.schedule_interval(self.my_close_callback, .05)
+
 
 
 
@@ -743,7 +755,8 @@ class RouteTextInput(MDTextField):
     def on_focus(self, inst, args):
         if args:
             self.parent.md_bg_color = "greenyellow"
-            self.text = ""
+            if self.text == "Маршрут":
+                self.text = ""
             self.font_size = "35sp"
         else:
             if not self.text:
@@ -751,17 +764,28 @@ class RouteTextInput(MDTextField):
                 self.font_size = "15sp"
                 self.text = "Маршрут"
 
+
+
+
 class KartaTextInput(MDTextField):
     def __init__(self, **kwargs):
         MDTextField.__init__(self, **kwargs)
+        self.val = ''
     def insert_text(self, value, from_undo=False):
         if value.isdigit():
-            if len(self.text) < 2:
+            self.val+=value
+            if len(self.text) < 2 and int(self.val) < 21:
                 return super().insert_text(value, from_undo=from_undo)
+            else:
+                if int(self.val) > 20:
+                    self.text = ''
+                    self.val = ''
+
     def on_focus(self, inst, args):
         if args:
             self.parent.md_bg_color = "greenyellow"
-            self.text = ""
+            if self.text == "Карта":
+                self.text = ""
             self.font_size = "35sp"
         else:
             if not self.text:
@@ -875,6 +899,11 @@ class Grid_for_All_Routs(MDGridLayout):
             ModalViewOneRout(self.butt_text).open()
             return False
 
+class Grid_for_One_rout(MDGridLayout):
+    def __init__(self, **kwargs):
+        MDGridLayout.__init__(self, **kwargs)
+        self.rows = 20
+
 class ModalViewAllRouts(ModalView):
     Builder.load_file(os.path.join(dir_name, "modalViewAllrouts.kv"))
     def __init__(self, **kwargs):
@@ -920,8 +949,6 @@ class ModalViewAllRouts(ModalView):
         self.border_y -= .05
         if self.border_y < self.omit_window:
             return False
-
-
 
 class MyApp(MDApp):
     def build(self):
