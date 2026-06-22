@@ -82,8 +82,7 @@ def screening_out(route:str)-> list:
     for routs_in_dct in DICT_ROUTE:
         if routs_in_dct.split("/")[0] == route:
             all_routs.append(routs_in_dct)
-    sorted(all_routs, key=lambda x: int(x.split("/")[1]))
-    print(all_routs,"85")
+    all_routs = sorted(all_routs, key=lambda x: int(x.split("/")[1]))
     return all_routs
 
 # def sorted_karts_of_routs(list_routs:list)-> list:
@@ -94,13 +93,14 @@ def screening_out(route:str)-> list:
 #     lst_karta.sort(key=int)
 #     return lst_karta
 
-def create_choice_sort_kart_of_rout(ch_route:str,list_karts:list)-> list:
-    """Создание маршрута с отсортированными картами"""
-    lst_routs = []
-    for karta in list_karts:
-        rout = ch_route+"/"+karta
-        lst_routs.append(rout)
-    return lst_routs
+# def create_choice_sort_kart_of_rout(ch_route:str,list_karts:list)-> list:
+#     """Создание маршрута с отсортированными картами"""
+#     lst_routs = []
+#     print(list_karts,"100")
+#     for karta in list_karts:
+#         rout = ch_route + "/" + karta
+#         lst_routs.append(rout)
+#     return lst_routs
 
 
 
@@ -110,9 +110,9 @@ def get_set_all_route()->list:
     for route in DICT_ROUTE:
         set_route.append(route.split("/")[0])
     set_route = sorted(set(set_route),key=int)
-    # lst = list(range(1,26))
+    # lst = list(range(1,10))
     return  set_route
-    # return  lst
+
 
 def exchange_worktime(sec):
     td = timedelta(seconds=sec)    
@@ -214,11 +214,78 @@ class PagesManager(MDScreenManager):
 
 
 class Timebox_main(MDScreen):
+    num_karta = StringProperty()
+
+    start_hours_day_1sm = StringProperty("-")
+    start_minutes_day_1sm = StringProperty("-")
+    finish_hours_day_1sm = StringProperty("-")
+    finish_minutes_day_1sm = StringProperty("-")
+
+    start_hours_day_2sm = StringProperty("-")
+    start_minutes_day_2sm = StringProperty("-")
+    finish_hours_day_2sm = StringProperty("-")
+    finish_minutes_day_2sm = StringProperty("-")
+
+    start_hours_end_1sm = StringProperty("-")
+    start_minutes_end_1sm = StringProperty("-")
+    finish_hours_end_1sm = StringProperty("-")
+    finish_minutes_end_1sm = StringProperty("-")
+
+    start_hours_end_2sm = StringProperty("-")
+    start_minutes_end_2sm = StringProperty("-")
+    finish_hours_end_2sm = StringProperty("-")
+    finish_minutes_end_2sm = StringProperty("-")
     Builder.load_file(os.path.join(dir_name, "main_timebox.kv"))
-    def __init__(self,lst_choice_rout:list, **kwargs):
+    def __init__(self,choice_rout:str, **kwargs):
         MDScreen.__init__(self, **kwargs)
-        self.lst_choice_rout = lst_choice_rout
-        # print(self.lst_choice_rout,"213")
+        self.choice_rout:str = choice_rout # 22/7
+        self.num_karta = choice_rout.split("/")[1]
+        self.parsing_time_routs()
+
+    def parsing_time_routs(self):
+        time_rout = DICT_ROUTE[self.choice_rout]
+        WEEKDAY_1sm = time_rout[0]
+        WEEKDAY_2sm = time_rout[1]
+        WEEKEND_1sm = time_rout[2]
+        WEEKEND_2sm = time_rout[3]
+        self.install_weekday_1sm(WEEKDAY_1sm)
+        self.install_weekday_2sm(WEEKDAY_2sm)
+        self.install_weekend_1sm(WEEKEND_1sm)
+        self.install_weekend_2sm(WEEKEND_2sm)
+
+    def install_weekday_1sm(self,time_rout_lst:list):
+        try:
+            self.start_hours_day_1sm = time_rout_lst[0]
+            self.start_minutes_day_1sm = time_rout_lst[1]
+            self.finish_hours_day_1sm = time_rout_lst[2]
+            self.finish_minutes_day_1sm = time_rout_lst[3]
+        except IndexError:
+            pass
+    def install_weekday_2sm(self,time_rout_lst:list):
+        try:
+            self.start_hours_day_2sm = time_rout_lst[0]
+            self.start_minutes_day_2sm = time_rout_lst[1]
+            self.finish_hours_day_2sm = time_rout_lst[2]
+            self.finish_minutes_day_2sm = time_rout_lst[3]
+        except IndexError:
+            pass
+    def install_weekend_1sm(self,time_rout_lst:list):
+        try:
+            self.start_hours_end_1sm = time_rout_lst[0]
+            self.start_minutes_end_1sm = time_rout_lst[1]
+            self.finish_hours_end_1sm = time_rout_lst[2]
+            self.finish_minutes_end_1sm = time_rout_lst[3]
+        except IndexError:
+            pass
+    def install_weekend_2sm(self,time_rout_lst:list):
+        try:
+            self.start_hours_end_1sm = time_rout_lst[0]
+            self.start_minutes_end_1sm = time_rout_lst[1]
+            self.finish_hours_end_1sm = time_rout_lst[2]
+            self.finish_minutes_end_1sm = time_rout_lst[3]
+        except IndexError:
+            pass
+
 
 
 
@@ -226,45 +293,42 @@ class Timebox_main(MDScreen):
 class ModalViewOneRout(ModalView):
     num_rout = StringProperty()
     Builder.load_file(os.path.join(dir_name, "modalOneRout.kv"))
-    # main_box_time = ObjectProperty()
     def __init__(self, choice_route_button, **kwargs):
         ModalView.__init__(self, **kwargs)
         self.choice_route_button = choice_route_button
-        self.all_choices_routs_sort = self.sortig_karts()
+        self.all_choices_routs_sort:list = self.sortig_karts()# list(range(1,21))
         self.border_y = 1
         self.pos_hint = {"center": 1, "y": self.border_y}
-        self.installing_data_choice_route(self.all_choices_routs_sort)
+        self.installing_data_choice_route()
 
 
+    def installing_data_choice_route(self):
+        self.num_rout = self.choice_route_button # Установка номера маршрута в заглавие
+        for kart in self.all_choices_routs_sort:
+            self.ids["main_box_time"].add_widget(Timebox_main(kart))
+        #self.set_bottom_box()
 
-
-    def installing_data_choice_route(self,list_all_karts):
-        self.num_rout = self.choice_route_button
-        for kart in list_all_karts:
-            self.ids["main_box_time"].add_widget(Timebox_main(list_all_karts))
-
-
-
-
-
+    def set_bottom_box(self):
+        """"Устанавливает размеры двух MDBoxLayouts, которые размещают карты маршрута.
+         В зависимости от кол-ва карт"""
+        self.ids["main_box_time"].size_hint_y = 1
+        self.ids["bottom_box"].size_hint_y = .001
 
 
     def sortig_karts(self)->list:
-        lst_all_routs = screening_out(self.choice_route_button)
-        # sort_all_karts = sorted_karts_of_routs(lst_all_routs)
-        all_choices_routs_sort = create_choice_sort_kart_of_rout(self.choice_route_button, lst_all_routs)
-        return all_choices_routs_sort
+        lst_all_routs:list = screening_out(self.choice_route_button) # ['22/1', '22/2', '22/3', '22/4']
+        return lst_all_routs
 
 
     def on_open(self):
         Clock.schedule_interval(self.my_open_callback, .05)
-
 
     def my_open_callback(self, arg):
         self.pos_hint = {"center": 1, "y": self.border_y}
         self.border_y -= .05
         if self.border_y < -.01:
             return False
+
     def on_touch_up(self, touch):
         self.dismiss()
 
@@ -288,7 +352,7 @@ class Page_main(MDScreen):
     def __init__(self, **kwargs):
         MDScreen.__init__(self, **kwargs)
 
-    def MyV(self):
+    def top_button_show_all_routs(self):
         ModalViewAllRouts().open()
 
     def show_statistic(self):
@@ -381,11 +445,6 @@ class Page_main(MDScreen):
             return route + "/" + karta
         else:
             return "Не введён"
-        
-
-
-
-
 
     def install_total_working_time(self,work_time):
         tot_time = work_time.split(":")
@@ -830,7 +889,14 @@ class ModalViewAllRouts(ModalView):
     def set_omit_window(self):
         if len(self.set_route) < 6:
             return  .75
-
+        if len(self.set_route) < 11:
+            return  .65
+        if len(self.set_route) < 16:
+            return  .55
+        if len(self.set_route) < 21:
+            return  .45
+        if len(self.set_route) < 26:
+            return  .35
 
     def on_touch_up(self, touch):
         Clock.schedule_interval(self.my_close_callback, .05)
@@ -842,9 +908,6 @@ class ModalViewAllRouts(ModalView):
         if self.border_y > 1:
             self.dismiss()
             return False
-
-
-
 
     def set_height_y_label(self):
         return ((ceil(len(self.set_route) / 5))+1) /10

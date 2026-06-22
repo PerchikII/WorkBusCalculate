@@ -1,9 +1,10 @@
 <ModalViewOneRout>:
     MDBoxLayout:
+        size_hint: 1,1
         md_bg_color: "black"
         orientation: "vertical"
         MDBoxLayout:
-            size_hint_y: .07
+            size_hint: 1,.07
             MDBoxLayout:
                 md_bg_color: "red"
                 TitleLabel:
@@ -28,7 +29,15 @@
             color: 1,1,1
 
         MDBoxLayout:
+            size_hint: 1,1
             orientation: "vertical"
-            id: main_box_time
-            size_hint_y: 1
+            MDBoxLayout:
+                size_hint: 1,1
+                orientation: "vertical"
+                id: main_box_time
+
+
+            MDBoxLayout:
+                id: bottom_box
+
 
