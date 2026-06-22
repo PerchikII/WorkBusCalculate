@@ -29,13 +29,17 @@
             color: 1,1,1
 
         MDBoxLayout:
-            size_hint: 1,1
+            size_hint: 1,.9
             orientation: "vertical"
             Grid_for_One_rout:
-                size_hint: 1,1
                 id: main_box_time
                 row_force_default: True
-                row_default_height: sp(30)
+                row_default_height: sp(28)
+        MDBoxLayout:
+            size_hint: 1,.05
+            DelButton:
+                id: delbutton
+                text:"Удалить маршрут"
 
 
 

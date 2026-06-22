@@ -55,8 +55,8 @@ def save_HDD_DICT(dictionary:dict, name_file:str):
 DICT_TIME = load_HDDfile(WORK_TIME_FILE)
 DICT_ROUTE = load_HDDfile(ROUTE_FILE)
 
-print("####### DICT_TIME ############")
-pprint(DICT_TIME)
+#print("####### DICT_TIME ############")
+#pprint(DICT_TIME)
 # print("+++++++++++++++++++++++++++++++++")
 print("####### DICT_ROUTE #############")
 pprint(DICT_ROUTE)
@@ -85,32 +85,11 @@ def screening_out(route:str)-> list:
     all_routs = sorted(all_routs, key=lambda x: int(x.split("/")[1]))
     return all_routs
 
-# def sorted_karts_of_routs(list_routs:list)-> list:
-#     """Сортировка карт выбранного маршрута"""
-#     lst_karta = []
-#     for karta in list_routs:
-#         lst_karta.append(karta.split("/")[1])
-#     lst_karta.sort(key=int)
-#     return lst_karta
-
-# def create_choice_sort_kart_of_rout(ch_route:str,list_karts:list)-> list:
-#     """Создание маршрута с отсортированными картами"""
-#     lst_routs = []
-#     print(list_karts,"100")
-#     for karta in list_karts:
-#         rout = ch_route + "/" + karta
-#         lst_routs.append(rout)
-#     return lst_routs
-
-
-
-
 def get_set_all_route()->list:
     set_route = []
     for route in DICT_ROUTE:
         set_route.append(route.split("/")[0])
     set_route = sorted(set(set_route),key=int)
-    # lst = list(range(1,10))
     return  set_route
 
 
@@ -200,8 +179,10 @@ def key_input(window, key, scancode, codepoint, modifier):
         sysexit()
 
 def checking_quantity_routs():
-    if len(DICT_ROUTE) < 26:
+    set_routes = get_set_all_route()
+    if len(set_routes) < 25:
         return True
+
 
 
 ################################################################################
@@ -291,57 +272,7 @@ class Timebox_main(MDScreen):
 
 
 
-class ModalViewOneRout(ModalView):
-    num_rout = StringProperty()
-    Builder.load_file(os.path.join(dir_name, "modalOneRout.kv"))
-    def __init__(self, choice_route_button, **kwargs):
-        ModalView.__init__(self, **kwargs)
-        self.choice_route_button = choice_route_button
-        self.all_choices_routs_sort:list = self.sortig_karts()# list(range(1,21))
-        self.border_y = 1
-        self.pos_hint = {"center": 1, "y": self.border_y}
-        self.installing_data_choice_route()
 
-
-    def installing_data_choice_route(self):
-        self.num_rout = self.choice_route_button # Установка номера маршрута в заглавие
-        for kart in self.all_choices_routs_sort:
-            self.ids["main_box_time"].add_widget(Timebox_main(kart))
-        #self.set_bottom_box()
-
-    def set_bottom_box(self):
-        """"Устанавливает размеры двух MDBoxLayouts, которые размещают карты маршрута.
-         В зависимости от кол-ва карт"""
-        self.ids["main_box_time"].size_hint_y = 1
-        self.ids["bottom_box"].size_hint_y = .001
-
-
-    def sortig_karts(self)->list:
-        lst_all_routs:list = screening_out(self.choice_route_button) # ['22/1', '22/2', '22/3', '22/4']
-        return lst_all_routs
-
-
-    def on_open(self):
-        Clock.schedule_interval(self.my_open_callback, .05)
-
-    def my_open_callback(self, t):
-        self.pos_hint = {"center": 1, "y": self.border_y}
-        self.border_y -= .05
-        if self.border_y < -.01:
-            return False
-##########################################################
-    ###################################################
-
-    def my_close_callback(self,t):
-        self.pos_hint = {"center": 1, "y": self.border_y}
-        self.border_y += .05
-        if self.border_y > 1:
-            self.dismiss()
-            return False
-
-
-    def on_touch_up(self, touch):
-        Clock.schedule_interval(self.my_close_callback, .05)
 
 
 
@@ -500,23 +431,18 @@ class Page_main(MDScreen):
 
     def create_route_kart(self):
         if checking_quantity_routs():
-            if self.get_route_user_choice():
-                num_route:str = self.get_route_user_choice() # Получ.маршрут 102/4
-                all_time_route:list = self.get_all_time_user_input() # Получ.время маршрута
-                if int(all_time_route[0]) < 12:
-                    smena = 0
-                else:
-                    smena = 1
-                list_time_in_route:list = DICT_ROUTE.get(num_route,["","","",""])
-                label_savetext = self.ids.savingtext
-                """Popup Вопрос: карта выходного или буднего дня"""
-                MyPopup_new_route(num_route,all_time_route,smena,list_time_in_route,label_savetext)
+            num_route:str = self.get_route_user_choice() # Получ.маршрут 102/4
+            all_time_route:list = self.get_all_time_user_input() # Получ.время маршрута
+            if int(all_time_route[0]) < 12:
+                smena = 0
             else:
-                print("Popup, Кол-во сохранённых карт маршрутов не должно превышать 20\n"
-                      "\t20 карт маршрутов максимум")
+                smena = 1
+            list_time_in_route:list = DICT_ROUTE.get(num_route,["","","",""])
+            label_savetext = self.ids.savingtext
+            """Popup Вопрос: карта выходного или буднего дня"""
+            MyPopup_new_route(num_route,all_time_route,smena,list_time_in_route,label_savetext)
         else:
-            print("Popup, Кол-во сохранённых маршрутов не должно превышать 25\n"
-                  "\t25 маршрутов максимум")
+            print("Popup, Можно сохранить только 25 маршрутов")
 
 
     def my_callback(self, instance):
@@ -904,6 +830,10 @@ class Grid_for_One_rout(MDGridLayout):
         MDGridLayout.__init__(self, **kwargs)
         self.rows = 20
 
+
+
+
+
 class ModalViewAllRouts(ModalView):
     Builder.load_file(os.path.join(dir_name, "modalViewAllrouts.kv"))
     def __init__(self, **kwargs):
@@ -918,14 +848,15 @@ class ModalViewAllRouts(ModalView):
     def set_omit_window(self):
         if len(self.set_route) < 6:
             return  .75
-        if len(self.set_route) < 11:
+        elif len(self.set_route) < 11:
             return  .65
-        if len(self.set_route) < 16:
+        elif len(self.set_route) < 16:
             return  .55
-        if len(self.set_route) < 21:
+        elif len(self.set_route) < 21:
             return  .45
-        if len(self.set_route) < 26:
+        else:
             return  .35
+
 
     def on_touch_up(self, touch):
         Clock.schedule_interval(self.my_close_callback, .05)
@@ -949,6 +880,74 @@ class ModalViewAllRouts(ModalView):
         self.border_y -= .05
         if self.border_y < self.omit_window:
             return False
+
+class ModalViewOneRout(ModalView):
+    num_rout = StringProperty()
+    Builder.load_file(os.path.join(dir_name, "modalOneRout.kv"))
+    def __init__(self, choice_route_button, **kwargs):
+        ModalView.__init__(self, **kwargs)
+        self.choice_route_button = choice_route_button
+        self.all_choices_routs_sort:list = self.sorting_karts()# list(range(1,21))
+        self.border_y = 1
+        self.pos_hint = {"center": 1, "y": self.border_y}
+        self.installing_data_choice_route()
+
+
+    def installing_data_choice_route(self):
+        self.num_rout = self.choice_route_button # Установка номера маршрута в заглавие
+        for kart in self.all_choices_routs_sort:
+            self.ids["main_box_time"].add_widget(Timebox_main(kart))
+
+
+    def sorting_karts(self)->list:
+        lst_all_routs:list = screening_out(self.choice_route_button) # ['22/1', '22/2', '22/3', '22/4']
+        return lst_all_routs
+
+
+    def on_open(self):
+        Clock.schedule_interval(self.my_open_callback, .05)
+
+    def my_open_callback(self, t):
+        self.pos_hint = {"center": 1, "y": self.border_y}
+        self.border_y -= .05
+        if self.border_y < -.05:
+            return False
+    def my_close_callback(self,t):
+        self.pos_hint = {"center": 1, "y": self.border_y}
+        self.border_y += .05
+        if self.border_y > 1:
+            self.dismiss()
+            return False
+
+    def on_touch_down(self, touch):
+        y = touch.pos[1]
+        if y < 30:
+            return super().on_touch_down(touch)
+        else:
+            Clock.schedule_interval(self.my_close_callback, .05)
+            return True
+    
+    def del_route(self):
+        lst_route_choice:list = screening_out(self.choice_route_button)
+        for delete_route in lst_route_choice:
+            del DICT_ROUTE[delete_route]
+        Clock.schedule_interval(self.my_close_callback, .05)
+        save_HDD_DICT(DICT_ROUTE,ROUTE_FILE)
+        Clock.schedule_once(self.close_open_new,1)
+
+    def close_open_new(self,t):
+        ModalViewAllRouts().open()
+
+class DelButton(Button):
+    def __init__(self, **kwargs):
+        Button.__init__(self, **kwargs)
+    def on_release(self):
+        while True:
+            try:
+                self.del_route()
+                break
+            except AttributeError:
+                self = self.parent
 
 class MyApp(MDApp):
     def build(self):

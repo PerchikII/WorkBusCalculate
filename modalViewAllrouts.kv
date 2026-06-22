@@ -4,19 +4,24 @@
         padding: dp(10)
         spacing: dp(5)
         Grid_for_All_Routs:
-            padding: [dp(20),dp(10),0,0]
+            padding: [dp(30),dp(10),0,0]
             spacing: dp(10)
             col_force_default: True
             row_force_default: True
             col_default_width: sp(45)
             row_default_height: sp(45)
-            size_hint_y: .7
+            # size_hint_y: .7
 
 
         MDBoxLayout:
-            size_hint_y: .3
+            size_hint_y: .2
             TitleLabel:
                 text: "[color=#E0FFFF]Записанные маршруты[/color]"
                 role: "medium"
+#        MDBoxLayout:
+#            size_hint_y: .2
+#            Button:
+#                on_release: print("Удалить машрут")
+#                text: "Удалить машрут"
 
 
