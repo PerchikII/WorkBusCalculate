@@ -326,32 +326,21 @@ class Page_main(MDScreen):
             self.ids.sm_1.state = "down"
             return 0
 
-
     def get_user_choice_date(self):
         day = self.ids["spinner_day"].text
         month = self.ids["spinner_month"].text
         return day + " " + month
 
-
-
-
-
     def search_rout_in_dict(self):
         route_and_karta = self.get_route_user_choice()
         smena = self.get_button_smena()
         if route_and_karta in DICT_ROUTE:
-            MyPopup_install_time(route_and_karta,
+            MyModalView_install_time(route_and_karta,
                                  smena,
                                  self.install_time_in_textinput)
         all_time_user_input: list = self.get_all_time_user_input()  # возвр все часы\минуты
         if check_value_is_numeric(all_time_user_input):
             self.turn_on_button_create_route()
-
-
-
-
-
-
 
     def install_time_in_textinput(self, HW_start, MW_start, HW_end, MW_end, HL_start, ML_start, HL_end, ML_end):
         tuple_input_time = ("startworkhours","startworkminutes",
@@ -462,7 +451,7 @@ class Page_main(MDScreen):
                 list_time_in_route:list = DICT_ROUTE.get(num_route,["","","",""])
                 label_savetext = self.ids.savingtext
                 """Popup Вопрос: карта выходного или буднего дня"""
-                MyPopup_new_route(num_route,all_time_route,smena,list_time_in_route,label_savetext)
+                MyModalView_new_route(num_route,all_time_route,smena,list_time_in_route,label_savetext)
             else:
                 MyPopup_save_only(karts_19=True)
         else:
@@ -502,10 +491,10 @@ class MyPopup_save_only(Popup):
         self.open()
 
 
-class MyPopup_install_time(Popup):
-    Builder.load_file(os.path.join(dir_name, "popup_install_time.kv"))
+class MyModalView_install_time(ModalView):
+    Builder.load_file(os.path.join(dir_name, "modalView_install_time.kv"))
     def __init__(self,route:str,smena:int,install_func,**kwargs):
-        Popup.__init__(self, **kwargs)
+        ModalView.__init__(self, **kwargs)
         self.KEY = route
         self.smena = smena
         self.INSTALL_FUNC = install_func
@@ -606,10 +595,10 @@ class MyPopup_save_new_workday(Popup):
         self.label.text_color = "red"
         self.label.text = "Сохранено"
 
-class MyPopup_new_route(Popup):
-    Builder.load_file(os.path.join(dir_name, "popup_new_route.kv"))
+class MyModalView_new_route(ModalView):
+    Builder.load_file(os.path.join(dir_name, "modalView_new_route.kv"))
     def __init__(self, num_route, all_time_new, smena, all_time_route:list["","","",""],lab, **kwargs):
-        Popup.__init__(self, **kwargs)
+        ModalView.__init__(self, **kwargs)
         self.num_route = num_route
         self.all_time_new = all_time_new
         self.smena = smena
