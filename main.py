@@ -8,23 +8,19 @@ from math import ceil
 
 from kivy.uix.button import Button
 
-from kivy.properties import ListProperty, StringProperty,ObjectProperty
+from kivy.properties import ListProperty, StringProperty
 from kivymd.uix.screenmanager import MDScreenManager
 from kivymd.uix.gridlayout import MDGridLayout
-from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.textfield import MDTextField
 from kivy.uix.modalview import ModalView
 from kivymd.uix.screen import MDScreen
-from kivymd.uix.label import MDLabel
 from kivy.uix.popup import Popup
-
 from kivy.lang.builder import Builder
 from kivy.core.window import Window
 from kivy.clock import Clock
-
 from kivymd.app import MDApp
 
-
+SEK_CLOCK:int = 2
 
 WORK_TIME_FILE = "worktime_data.dat"
 ROUTE_FILE = "routes_data.dat"
@@ -55,9 +51,10 @@ def save_HDD_DICT(dictionary:dict, name_file:str):
 DICT_TIME = load_HDDfile(WORK_TIME_FILE)
 DICT_ROUTE = load_HDDfile(ROUTE_FILE)
 
-#print("####### DICT_TIME ############")
-#pprint(DICT_TIME)
-# print("+++++++++++++++++++++++++++++++++")
+
+print("####### DICT_TIME ############")
+pprint(DICT_TIME)
+print("+++++++++++++++++++++++++++++++++")
 print("####### DICT_ROUTE #############")
 pprint(DICT_ROUTE)
 print("+++++++++++++++++++++++++++++++++")
@@ -89,7 +86,7 @@ def get_set_all_route()->list:
     set_route = []
     for route in DICT_ROUTE:
         set_route.append(route.split("/")[0])
-    set_route = sorted(set(set_route),key=int)
+    set_route:list = sorted(set(set_route),key=int)
     return  set_route
 
 
@@ -178,12 +175,21 @@ def key_input(window, key, scancode, codepoint, modifier):
     if key == 27:
         sysexit()
 
-def checking_quantity_routs():
-    set_routes = get_set_all_route()
-    if len(set_routes) < 25:
+def checking_quantity_routs(route:str):
+    set_routes:list = get_set_all_route()
+    if route in set_routes:
+        return True
+    elif len(set_routes) < 25:
         return True
 
 
+def checking_quantity_karts(route:str,karta:str):
+    set_karts:list = screening_out(route)
+    lst_karts = [x.split("/")[1] for x in set_karts]
+    if karta in lst_karts:
+        return True
+    elif len(lst_karts) < 19:
+        return True
 
 ################################################################################
 ################################################################################
@@ -261,20 +267,12 @@ class Timebox_main(MDScreen):
             pass
     def install_weekend_2sm(self,time_rout_lst:list):
         try:
-            self.start_hours_end_1sm = time_rout_lst[0]
-            self.start_minutes_end_1sm = time_rout_lst[1]
-            self.finish_hours_end_1sm = time_rout_lst[2]
-            self.finish_minutes_end_1sm = time_rout_lst[3]
+            self.start_hours_end_2sm = time_rout_lst[0]
+            self.start_minutes_end_2sm = time_rout_lst[1]
+            self.finish_hours_end_2sm = time_rout_lst[2]
+            self.finish_minutes_end_2sm = time_rout_lst[3]
         except IndexError:
             pass
-
-
-
-
-
-
-
-
 
 
 
@@ -295,8 +293,16 @@ class Page_main(MDScreen):
     def __init__(self, **kwargs):
         MDScreen.__init__(self, **kwargs)
 
-    def top_button_show_all_routs(self):
-        ModalViewAllRouts().open()
+    def top_button(self):
+        if DICT_ROUTE:
+            self.ids["all_routs"].background_color = "#006400"
+            self.ids["all_routs"].text = "маршруты"
+            ModalViewAllRouts().open()
+        else:
+            self.ids["all_routs"].background_color = 1,0,0,.5
+            self.ids["all_routs"].text = "Нет записанных маршрутов"
+
+
 
     def show_statistic(self):
         current_date = self.get_user_choice_date()
@@ -326,6 +332,10 @@ class Page_main(MDScreen):
         month = self.ids["spinner_month"].text
         return day + " " + month
 
+
+
+
+
     def search_rout_in_dict(self):
         route_and_karta = self.get_route_user_choice()
         smena = self.get_button_smena()
@@ -336,6 +346,12 @@ class Page_main(MDScreen):
         all_time_user_input: list = self.get_all_time_user_input()  # возвр все часы\минуты
         if check_value_is_numeric(all_time_user_input):
             self.turn_on_button_create_route()
+
+
+
+
+
+
 
     def install_time_in_textinput(self, HW_start, MW_start, HW_end, MW_end, HL_start, ML_start, HL_end, ML_end):
         tuple_input_time = ("startworkhours","startworkminutes",
@@ -429,20 +445,31 @@ class Page_main(MDScreen):
                                      all_time_user_input, label_save_text)
 
 
+
+
     def create_route_kart(self):
-        if checking_quantity_routs():
-            num_route:str = self.get_route_user_choice() # Получ.маршрут 102/4
-            all_time_route:list = self.get_all_time_user_input() # Получ.время маршрута
-            if int(all_time_route[0]) < 12:
-                smena = 0
+        choice_Route = self.ids["route_number_textinput"].text
+        choice_Karta = self.ids["karta_route_number_textinput"].text
+
+        if checking_quantity_routs(choice_Route):
+            if checking_quantity_karts(choice_Route,choice_Karta):
+                num_route:str = self.get_route_user_choice() # Получ.маршрут 102/4
+                all_time_route:list = self.get_all_time_user_input() # Получ.время маршрута
+                if int(all_time_route[0]) < 12:
+                    smena = 0
+                else:
+                    smena = 1
+                list_time_in_route:list = DICT_ROUTE.get(num_route,["","","",""])
+                label_savetext = self.ids.savingtext
+                """Popup Вопрос: карта выходного или буднего дня"""
+                MyPopup_new_route(num_route,all_time_route,smena,list_time_in_route,label_savetext)
             else:
-                smena = 1
-            list_time_in_route:list = DICT_ROUTE.get(num_route,["","","",""])
-            label_savetext = self.ids.savingtext
-            """Popup Вопрос: карта выходного или буднего дня"""
-            MyPopup_new_route(num_route,all_time_route,smena,list_time_in_route,label_savetext)
+                MyPopup_save_only(karts_19=True)
         else:
-            print("Popup, Можно сохранить только 25 маршрутов")
+            MyPopup_save_only(rout_25=True)
+
+
+
 
 
     def my_callback(self, instance):
@@ -451,10 +478,29 @@ class Page_main(MDScreen):
         return False
 
     def change_save_text_label(self):
-        Clock.schedule_once(self.my_callback, 2)
+        Clock.schedule_once(self.my_callback, SEK_CLOCK)
         # self.label.theme_text_color = "Custom"
         self.ids.savingtext.text_color = "red"
         self.ids.savingtext.text = "Сохранено"
+
+class MyPopup_save_only(Popup):
+    lab_text = StringProperty()
+    Builder.load_file(os.path.join(dir_name, "popup_save_only.kv"))
+    def __init__(self, rout_25=None, karts_19=None, **kwargs):
+        Popup.__init__(self, **kwargs)
+        self.title = "   Внимание!\nЕсть ограничение!"
+        self.my_size = "20sp"
+        if rout_25:
+            self.lab_text = (f"Можно сохранить только [size={self.my_size}]25[/size] маршрутов.\n"
+                              "Для удаления маршрута перейдите во вкладку\n"
+                             "[color=#006400]'маршруты'[/color], выберите маршрут и нажмите\n"
+                             "внизу экрана кнопку [color=#A52A2A]'удалить маршрут'[/color].")
+        elif karts_19:
+            self.lab_text = (f"Можно сохранить только [size={self.my_size}]19[/size] карт на маршрут.\n"
+                             "Для переопределения карты введите новые\n"
+                             "данные и согласитесь на изменения")
+        self.open()
+
 
 class MyPopup_install_time(Popup):
     Builder.load_file(os.path.join(dir_name, "popup_install_time.kv"))
@@ -463,6 +509,7 @@ class MyPopup_install_time(Popup):
         self.KEY = route
         self.smena = smena
         self.INSTALL_FUNC = install_func
+        self.overlay_color = [0, 0, 0, 0]  # Затемнение root-экрана
         self.open()
 
     def weekday(self):
@@ -530,6 +577,7 @@ class MyPopup_save_new_workday(Popup):
         self.install_time_work_in_labels()
         self.label = lab
         self.curr_data = date
+        self.overlay_color = [0, 0, 0, 0]  # Затемнение root-экрана
         self.open()
 
     def install_time_work_in_labels(self):
@@ -554,7 +602,7 @@ class MyPopup_save_new_workday(Popup):
         return False
 
     def change_save_text_label(self):
-        Clock.schedule_once(self.my_callback, 2)
+        Clock.schedule_once(self.my_callback, SEK_CLOCK)
         self.label.text_color = "red"
         self.label.text = "Сохранено"
 
@@ -567,6 +615,7 @@ class MyPopup_new_route(Popup):
         self.smena = smena
         self.all_time_route:list = all_time_route
         self.label_savetext = lab
+        self.overlay_color = [0,0,0,0] # Затемнение root-экрана
         self.open()
 
     def weekday(self):
@@ -580,7 +629,7 @@ class MyPopup_new_route(Popup):
 
 
     def weekend(self):
-        """Выходной день- индекс для списка маршрута self.smena + 2"""
+        """Выходной день- это индекс для списка маршрута self.smena + 2"""
         self.smena += 2
         if not self.all_time_route[self.smena]:
             self.all_time_route[self.smena] = self.all_time_new
@@ -597,7 +646,7 @@ class MyPopup_new_route(Popup):
         return False
 
     def change_save_text_label(self):
-        Clock.schedule_once(self.my_callback, 3)
+        Clock.schedule_once(self.my_callback, SEK_CLOCK)
         self.label_savetext.text_color = "red"
         self.label_savetext.text = "Сохранено"
 
@@ -619,6 +668,7 @@ class MyPopup_change_route(Popup):
         self.smena:int = smena
         self.pars_dict_old_route()
         self.label_savetext = lab
+        self.overlay_color = [0, 0, 0, .9]  # Затемнение root-экрана
         self.open()
 
     def pars_dict_old_route(self):
@@ -641,7 +691,7 @@ class MyPopup_change_route(Popup):
         return False
 
     def change_save_text_label(self):
-        Clock.schedule_once(self.my_callback, 3)
+        Clock.schedule_once(self.my_callback, SEK_CLOCK)
         self.label_savetext.text_color = "red"
         self.label_savetext.text = "Сохранено"
 
@@ -660,6 +710,7 @@ class MyPopup_page_stat(Popup):
         Popup.__init__(self, **kwargs)
         self.title = title_date.split()[1]
         self.curr_date = title_date
+        self.overlay_color = [0, 0, 0, .9]  # Затемнение root-экрана
         self.install_statistic()
 
     def install_statistic(self):
@@ -671,41 +722,45 @@ class MyPopup_page_stat(Popup):
         self.route, self.karta = get_karta(self.curr_date)
         self.karta_hours, self.karta_min = get_karta_worktime(self.curr_date)
 
+
 class RouteTextInput(MDTextField):
     def __init__(self, **kwargs):
         MDTextField.__init__(self, **kwargs)
+
     def insert_text(self, value, from_undo=False):
         if value.isdigit():
-            if len(self.text) < 3:
+            if len(self.text) < 4:
                 return super().insert_text(value, from_undo=from_undo)
+
     def on_focus(self, inst, args):
         if args:
             self.parent.md_bg_color = "greenyellow"
             if self.text == "Маршрут":
                 self.text = ""
-            self.font_size = "35sp"
+            self.font_size = "33sp"
         else:
             if not self.text:
                 self.parent.md_bg_color = self.parent_color
                 self.font_size = "15sp"
                 self.text = "Маршрут"
-
+    def do_backspace(self, from_undo=False, mode='bkspc'):
+        self.text = ""
 
 
 
 class KartaTextInput(MDTextField):
     def __init__(self, **kwargs):
         MDTextField.__init__(self, **kwargs)
-        self.val = ''
+
+
     def insert_text(self, value, from_undo=False):
         if value.isdigit():
-            self.val+=value
-            if len(self.text) < 2 and int(self.val) < 21:
+            if len(self.text) < 2:
                 return super().insert_text(value, from_undo=from_undo)
-            else:
-                if int(self.val) > 20:
-                    self.text = ''
-                    self.val = ''
+
+    def do_backspace(self, from_undo=False, mode='bkspc'):
+        self.text = ""
+
 
     def on_focus(self, inst, args):
         if args:
@@ -830,10 +885,6 @@ class Grid_for_One_rout(MDGridLayout):
         MDGridLayout.__init__(self, **kwargs)
         self.rows = 20
 
-
-
-
-
 class ModalViewAllRouts(ModalView):
     Builder.load_file(os.path.join(dir_name, "modalViewAllrouts.kv"))
     def __init__(self, **kwargs):
@@ -844,6 +895,7 @@ class ModalViewAllRouts(ModalView):
         self.size_hint_y: float = self.set_height_y_label()
         self.omit_window: float =  self.set_omit_window()  #.75
         self.pos_hint = {"x": 1, "y": self.border_y}
+        self.overlay_color = [0,0,0,0] # Затемнение root-экрана
 
     def set_omit_window(self):
         if len(self.set_route) < 6:
@@ -891,6 +943,7 @@ class ModalViewOneRout(ModalView):
         self.border_y = 1
         self.pos_hint = {"center": 1, "y": self.border_y}
         self.installing_data_choice_route()
+        self.overlay_color = [0, 0, 0, 0] # Затемнение root-экрана
 
 
     def installing_data_choice_route(self):
@@ -898,11 +951,9 @@ class ModalViewOneRout(ModalView):
         for kart in self.all_choices_routs_sort:
             self.ids["main_box_time"].add_widget(Timebox_main(kart))
 
-
     def sorting_karts(self)->list:
         lst_all_routs:list = screening_out(self.choice_route_button) # ['22/1', '22/2', '22/3', '22/4']
         return lst_all_routs
-
 
     def on_open(self):
         Clock.schedule_interval(self.my_open_callback, .05)
@@ -912,6 +963,7 @@ class ModalViewOneRout(ModalView):
         self.border_y -= .05
         if self.border_y < -.05:
             return False
+
     def my_close_callback(self,t):
         self.pos_hint = {"center": 1, "y": self.border_y}
         self.border_y += .05
@@ -921,10 +973,12 @@ class ModalViewOneRout(ModalView):
 
     def on_touch_down(self, touch):
         y = touch.pos[1]
-        if y < 30:
-            return super().on_touch_down(touch)
+        button = self.ids["delbutton"]
+        if  button.get_top()-30 < y < button.get_top():  # Получает высоту по Y кнопки "Удалить маршрут"
+
+            return super(ModalViewOneRout,self).on_touch_down(touch)
         else:
-            Clock.schedule_interval(self.my_close_callback, .05)
+            Clock.schedule_interval(self.my_close_callback, .04)
             return True
     
     def del_route(self):
@@ -936,7 +990,8 @@ class ModalViewOneRout(ModalView):
         Clock.schedule_once(self.close_open_new,1)
 
     def close_open_new(self,t):
-        ModalViewAllRouts().open()
+        if DICT_ROUTE:
+            ModalViewAllRouts().open()
 
 class DelButton(Button):
     def __init__(self, **kwargs):

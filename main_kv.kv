@@ -65,6 +65,7 @@
         MDBoxLayout:
             size_hint_y: .025
             Button:
+                id: all_routs
                 bold: True
                 text: "маршруты"
                 background_normal: ""
@@ -72,7 +73,7 @@
                 size_hint: 1,1
                 halign: "center"
                 valign: "center"
-                on_release: root.top_button_show_all_routs()
+                on_release: root.top_button()
 #                    root.manager.transition = SlideTransition()
 #                    root.manager.current = "routes_page"
 #                    root.manager.transition.direction = "down"

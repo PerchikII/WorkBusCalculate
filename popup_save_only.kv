@@ -1,0 +1,19 @@
+<MyPopup_save_only>:
+    size_hint: (1,.5)
+    pos_hint: {"x_center": 1,"y": .5}
+    # halign: "center"
+    title_size: sp(20)
+    title_align: "center"
+    separator_color: .8,.8,.8
+    MDScreen:
+        md_bg_color: .8,.8,.8
+        TitleLabel:
+            text: root.lab_text
+            markup: True
+            size_hint:1, 1
+            font_style:"Title"
+            role:"small"
+            bold:True
+            text_size:self.size
+            halign:"center"
+            valign:"center"
