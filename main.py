@@ -223,12 +223,23 @@ class Timebox_main(MDScreen):
     finish_hours_end_2sm = StringProperty("-")
     finish_minutes_end_2sm = StringProperty("-")
 
+
+
     Builder.load_file(os.path.join(dir_name, "main_timebox.kv"))
     def __init__(self,choice_rout:str, **kwargs):
         MDScreen.__init__(self, **kwargs)
         self.choice_rout:str = choice_rout # 22/7
         self.num_karta = choice_rout.split("/")[1]
+        self.my_id = self.num_karta
         self.parsing_time_routs()
+
+    def del_choice_karta_func(self,del_karta):
+        self.parent.remove_widget(self)
+        del_route = self.choice_rout.split("/")[0]
+        del_key = (del_route+"/"+del_karta)
+        del DICT_ROUTE[del_key]
+        save_HDD_DICT(DICT_ROUTE,ROUTE_FILE)
+
 
     def parsing_time_routs(self):
         time_rout = DICT_ROUTE[self.choice_rout]
@@ -878,13 +889,19 @@ class ModalViewAllRouts(ModalView):
     Builder.load_file(os.path.join(dir_name, "modalViewAllrouts.kv"))
     def __init__(self, **kwargs):
         ModalView.__init__(self, **kwargs)
-        self.auto_dismiss = False
         self.set_route: list = get_set_all_route()
         self.border_y = 1
         self.size_hint_y: float = self.set_height_y_label()
         self.omit_window: float =  self.set_omit_window()  #.75
         self.pos_hint = {"x": 1, "y": self.border_y}
         self.overlay_color = [0,0,0,0] # Затемнение root-экрана
+
+
+
+    def _handle_keyboard(self, _window, key, *_args):
+        if key == 27:
+            Clock.schedule_interval(self.my_close_callback, .04)
+            return True
 
     def set_omit_window(self):
         if len(self.set_route) < 6:
@@ -927,22 +944,22 @@ class ModalViewOneRout(ModalView):
     Builder.load_file(os.path.join(dir_name, "modalOneRout.kv"))
     def __init__(self, choice_route_button, **kwargs):
         ModalView.__init__(self, **kwargs)
+        self.overlay_color = [0, 0, 0, 0]  # Затемнение root-экрана
         self.choice_route_button = choice_route_button
-        self.all_choices_routs_sort:list = self.sorting_karts()# list(range(1,21))
+        self.all_choices_routs_sort:list = screening_out(self.choice_route_button)
         self.border_y = 1
         self.pos_hint = {"center": 1, "y": self.border_y}
         self.installing_data_choice_route()
-        self.overlay_color = [0, 0, 0, 0] # Затемнение root-экрана
 
+    def _handle_keyboard(self, _window, key, *_args):
+        if key == 27:
+            Clock.schedule_interval(self.my_close_callback, .04)
+            return True
 
     def installing_data_choice_route(self):
         self.num_rout = self.choice_route_button # Установка номера маршрута в заглавие
         for kart in self.all_choices_routs_sort:
             self.ids["main_box_time"].add_widget(Timebox_main(kart))
-
-    def sorting_karts(self)->list:
-        lst_all_routs:list = screening_out(self.choice_route_button) # ['22/1', '22/2', '22/3', '22/4']
-        return lst_all_routs
 
     def on_open(self):
         Clock.schedule_interval(self.my_open_callback, .05)
@@ -960,22 +977,21 @@ class ModalViewOneRout(ModalView):
             self.dismiss()
             return False
 
-    def on_touch_down(self, touch):
-        y = touch.pos[1]
-        button = self.ids["delbutton"]
-        if  button.get_top()-30 < y < button.get_top():  # Получает высоту по Y кнопки "Удалить маршрут"
-
-            return super(ModalViewOneRout,self).on_touch_down(touch)
-        else:
-            Clock.schedule_interval(self.my_close_callback, .04)
-            return True
+    # def on_touch_down(self, touch):
+        # touch_y = touch.pos[1]
+        # button = self.ids["delbutton"]
+        # if touch_y < button.get_top():  # Получает высоту по Y кнопки "Удалить маршрут"
+        #     return super().on_touch_down(touch)
+        # else:
+        #     Clock.schedule_interval(self.my_close_callback, .04)
+        #     return True
     
     def del_route(self):
         lst_route_choice:list = screening_out(self.choice_route_button)
         for delete_route in lst_route_choice:
             del DICT_ROUTE[delete_route]
+        save_HDD_DICT(DICT_ROUTE, ROUTE_FILE)
         Clock.schedule_interval(self.my_close_callback, .05)
-        save_HDD_DICT(DICT_ROUTE,ROUTE_FILE)
         Clock.schedule_once(self.close_open_new,1)
 
     def close_open_new(self,t):
@@ -985,13 +1001,15 @@ class ModalViewOneRout(ModalView):
 class DelButton(Button):
     def __init__(self, **kwargs):
         Button.__init__(self, **kwargs)
+
     def on_release(self):
+        obj = self
         while True:
             try:
-                self.del_route()
+                obj.del_route()
                 break
             except AttributeError:
-                self = self.parent
+                obj = obj.parent
 
 class MyApp(MDApp):
     def build(self):

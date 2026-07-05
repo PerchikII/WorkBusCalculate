@@ -1,7 +1,6 @@
 <TimeLabel@MDLabel>
     markup: True
     size_hint: 1, 1
-    # font_size: 30
     color: 1,1,1
     font_style: "Title"
     role: "small"
@@ -12,12 +11,11 @@
 
 
 <Timebox_main>:
-    # size_hint: 1,1
     MDBoxLayout:
         size_hint: 1,1
         MDBoxLayout:
             md_bg_color: 1,0,0,.5
-            size_hint: .4,1
+            size_hint: .35,1
             orientation: "vertical"
             MDBoxLayout:
                 TimeLabel:
@@ -34,11 +32,12 @@
         MDBoxLayout:
             size_hint_x: .2
             TimeLabel:
+                id: karta_num
                 text: root.num_karta
                 role: "large"
         MDBoxLayout:
             md_bg_color: 0,0,1,.5
-            size_hint_x: .4
+            size_hint_x: .35
             orientation: "vertical"
             MDBoxLayout:
                 TimeLabel:
@@ -52,13 +51,16 @@
                     text: "2"
                 TimeLabel:
                     text: f"{root.start_hours_end_2sm}:{root.start_minutes_end_2sm} - {root.finish_hours_end_2sm}:{root.finish_minutes_end_2sm}"
-
+        MDBoxLayout:
+            size_hint_x: .3
+            Button:
+                text: "Удалить"
+                on_release: root.del_choice_karta_func(karta_num.text)
     MDDivider:
         size_hint_x: 1
         theme_divider_color: "Custom"
         color: 1,1,1
-#    MDBoxLayout:
-#        size_hint_y: .9
+
 
 
 
