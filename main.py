@@ -1,9 +1,10 @@
+
 import time
 import os
 from sys import exit as sysexit
 from datetime import timedelta
 import pickle
-from pprint import pprint
+# from pprint import pprint
 from math import ceil
 import threading
 
@@ -27,38 +28,91 @@ WORK_TIME_FILE = "worktime_data.dat"
 ROUTE_FILE = "routes_data.dat"
 
 
-
 """Директория main.py"""
 dir_name = os.getcwd()
+file_dir_name = "/storage/emulated/0/Documents"
+
+def open_HDDfile_from_doc(open_file):
+    print(f"Открываю в :{file_dir_name} ", open_file)
+    with open(os.path.join(file_dir_name, open_file), 'rb') as file:
+        file_dict = pickle.load(file)
+        print(f"Успешно открыт в open_HDDfile_from_doc :{file_dir_name} ", open_file)
+        return file_dict
+
+def open_HDDfile_from_root(open_file):
+    print(f"Не открылся в : {file_dir_name} ", open_file)
+    with open(os.path.join(dir_name, open_file), 'rb') as file:
+        file_dict = pickle.load(file)
+        print(f"Успешно открыт в open_HDDfile_from_root {dir_name}: ", open_file)
+        return file_dict
+
+def create_new_HDDfile_in_doc(open_file):
+    print(f"Не открылся в : {dir_name} ", open_file)
+    print(f"Создаём новый в {file_dir_name}")
+    with open(os.path.join(file_dir_name, open_file), 'wb') as obj:
+        file_dict = {}
+        pickle.dump(file_dict, obj)
+        print(f"Успешно создан пустой в create_new_HDDfile_in_doc :{file_dir_name} ", open_file)
+        return file_dict
+
+def create_new_HDDfile_in_root(open_file):
+    print(f"Не записался в :{file_dir_name} ", open_file)
+    with open(os.path.join(dir_name, open_file), 'wb') as obj:
+        file_dict = {}
+        pickle.dump(file_dict, obj)
+        print(f"Файл записан в корневую папку программы: {dir_name}")
+        return file_dict
+
 
 def load_HDDfile(open_file):
     try:
-        with open(os.path.join(dir_name,open_file), 'rb') as file:
-            file_dict = pickle.load(file)
-            print("Успешно открыт: ",open_file)
+        file_dict = open_HDDfile_from_doc(open_file)
+        return file_dict
+    except Exception as err:
+        print("+++ load_HDDfile +", err, "+++")
+        try:
+            file_dict = open_HDDfile_from_root(open_file)
             return file_dict
-    except (FileNotFoundError, IOError, EOFError):
-        # Код одноразовый для первого запуска программы
-        print("Не открылся: ",open_file," Создался пустой")
-        with open(os.path.join(dir_name, open_file), 'wb') as obj:
-            file_dict = {}
-            pickle.dump(file_dict, obj)
-            return file_dict
+        except Exception as err:
+            print("+++ load_HDDfile +", err, "+++")
+            try:
+                file_dict = create_new_HDDfile_in_doc(open_file)
+                return file_dict
+            except Exception as err:
+                print("+++ load_HDDfile +", err, "+++")
+                file_dict = create_new_HDDfile_in_root(open_file)
+                return file_dict
+
+
+
+
 
 def save_HDD_DICT(dictionary:dict, name_file:str):
-    with open(os.path.join(dir_name,name_file), 'wb') as file:
-        pickle.dump(dictionary, file)
+    try:
+        with open(os.path.join(file_dir_name,name_file), 'wb') as file:
+            pickle.dump(dictionary, file)
+            print(f"Файл успешно записан в :{file_dir_name}")
+    except Exception as err:
+        print("Ошибка save_HDD_DICT: ", err)
+        print(f"Файл записан в корневую папку программы.{dir_name}")
+        with open(os.path.join(dir_name,name_file), 'wb') as file:
+            pickle.dump(dictionary, file)
+
+
+
+
+
 
 DICT_TIME = load_HDDfile(WORK_TIME_FILE)
 DICT_ROUTE = load_HDDfile(ROUTE_FILE)
 
 
-print("####### DICT_TIME ############")
-pprint(DICT_TIME)
-print("+++++++++++++++++++++++++++++++++")
-print("####### DICT_ROUTE #############")
-pprint(DICT_ROUTE)
-print("+++++++++++++++++++++++++++++++++")
+# print("####### DICT_TIME ############")
+# pprint(DICT_TIME)
+# print("+++++++++++++++++++++++++++++++++")
+# print("####### DICT_ROUTE #############")
+# pprint(DICT_ROUTE)
+# print("+++++++++++++++++++++++++++++++++")
 
 month_lst = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
              'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь']
@@ -243,7 +297,6 @@ class Timebox_main(MDScreen):
 
 
     def parsing_time_routs(self):
-        print("second thread")
         time_rout = DICT_ROUTE[self.choice_rout]
         WEEKDAY_1sm = time_rout[0]
         WEEKDAY_2sm = time_rout[1]
@@ -305,14 +358,6 @@ class Page_main(MDScreen):
 
     def __init__(self, **kwargs):
         MDScreen.__init__(self, **kwargs)
-        self.bind(size=self.func)
-
-
-    def func(self,a,b):
-        print(Window.size)
-
-
-
 
     def top_button(self):
         if DICT_ROUTE:
@@ -322,8 +367,6 @@ class Page_main(MDScreen):
         else:
             self.ids["all_routs"].background_color = 1,0,0,.5
             self.ids["all_routs"].text = "Нет записанных маршрутов"
-
-
 
     def show_statistic(self):
         current_date = self.get_user_choice_date()
@@ -960,6 +1003,10 @@ class ModalViewOneRout(ModalView):
         ModalView.__init__(self, **kwargs)
         self.overlay_color = [0, 0, 0, 0]  # Затемнение root-экрана
         self.choice_route_button = choice_route_button
+        if len(self.choice_route_button) > 3:
+            self.ids["box_day"].size_hint_x = .25
+            self.ids["box_num_route"].size_hint_x = .25
+            self.ids["box_week"].size_hint_x = .25
         self.all_choices_routs_sort:list = screening_out(self.choice_route_button)
         self.border_y = 1
         self.pos_hint = {"center": 1, "y": self.border_y}
@@ -977,8 +1024,11 @@ class ModalViewOneRout(ModalView):
         for kart in self.all_choices_routs_sort:
             self.ids["main_box_time"].add_widget(Timebox_main(kart))
 
-    def on_open(self):
+    def open_modal_view(self):
         Clock.schedule_interval(self.my_open_callback, .05)
+
+    def on_open(self):
+        threading.Thread(target=self.open_modal_view).start()
 
     def my_open_callback(self, t):
         self.pos_hint = {"center": 1, "y": self.border_y}
@@ -993,14 +1043,15 @@ class ModalViewOneRout(ModalView):
             self.dismiss()
             return False
 
-    # def on_touch_down(self, touch):
-        # touch_y = touch.pos[1]
-        # button = self.ids["delbutton"]
-        # if touch_y < button.get_top():  # Получает высоту по Y кнопки "Удалить маршрут"
-        #     return super().on_touch_down(touch)
-        # else:
-        #     Clock.schedule_interval(self.my_close_callback, .04)
-        #     return True
+    def on_touch_down(self, touch):
+        touch_x = touch.pos[0]
+        touch_y = touch.pos[1]
+        button = self.ids["delbutton"]
+        if touch_y < button.get_top() or touch_x > 260:  # Получает высоту по Y кнопки "Удалить маршрут"
+            return super().on_touch_down(touch)
+        else:
+            Clock.schedule_interval(self.my_close_callback, .04)
+            return True
     
     def del_route(self):
         lst_route_choice:list = screening_out(self.choice_route_button)

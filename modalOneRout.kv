@@ -1,3 +1,5 @@
+#:kivy 2.3.1
+
 <ModalViewOneRout>:
     MDBoxLayout:
         size_hint: 1,1
@@ -6,13 +8,15 @@
         MDBoxLayout:
             size_hint: 1,.07
             MDBoxLayout:
-                size_hint_x: .4
+                id: box_day
+                size_hint_x: .3
                 md_bg_color: 1,0,0,.5
                 TitleLabel:
                     text: "Будние"
                     color: "white"
             MDBoxLayout:
-                size_hint_x: .2
+                id: box_num_route
+                size_hint_x: .2# .35
                 md_bg_color: "black"
                 TitleLabel:
                     font_style: "Display"
@@ -21,13 +25,15 @@
                     color: "white"
                     valign: "top" # ?????????????????????????????????????????
             MDBoxLayout:
-                size_hint_x: .4
+                id: box_week
+                size_hint_x: .3
                 md_bg_color: "blue"
                 TitleLabel:
                     text: "Выходные"
                     color: "white"
             MDBoxLayout:
-                size_hint_x: .25
+                id: butt_del_karta
+                size_hint_x: .2
                 md_bg_color: "green"
                 TitleLabel:
                     text: "Удалить\n карту"
