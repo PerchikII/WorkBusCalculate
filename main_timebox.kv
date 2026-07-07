@@ -4,7 +4,7 @@
     color: 1,1,1
     font_style: "Title"
     role: "small"
-    bold: True
+    # bold: True
     text_size: self.size
     halign: "center"
     valign: "center"
@@ -20,17 +20,19 @@
             MDBoxLayout:
                 TimeLabel:
                     size_hint_x: .1
+                    bold: True
                     text: "1"
                 TimeLabel:
                     text: f"{root.start_hours_day_1sm}:{root.start_minutes_day_1sm} - {root.finish_hours_day_1sm}:{root.finish_minutes_day_1sm}"
             MDBoxLayout:
                 TimeLabel:
                     size_hint_x: .1
+                    bold: True
                     text: "2"
                 TimeLabel:
                     text: f"{root.start_hours_day_2sm}:{root.start_minutes_day_2sm} - {root.finish_hours_day_2sm}:{root.finish_minutes_day_2sm}"
         MDBoxLayout:
-            size_hint_x: .2
+            size_hint_x: .15
             TimeLabel:
                 id: karta_num
                 text: root.num_karta
@@ -42,17 +44,19 @@
             MDBoxLayout:
                 TimeLabel:
                     size_hint_x: .1
+                    bold: True
                     text: "1"
                 TimeLabel:
                     text: f"{root.start_hours_end_1sm}:{root.start_minutes_end_1sm} - {root.finish_hours_end_1sm}:{root.finish_minutes_end_1sm}"
             MDBoxLayout:
                 TimeLabel:
                     size_hint_x: .1
+                    bold: True
                     text: "2"
                 TimeLabel:
                     text: f"{root.start_hours_end_2sm}:{root.start_minutes_end_2sm} - {root.finish_hours_end_2sm}:{root.finish_minutes_end_2sm}"
         MDBoxLayout:
-            size_hint_x: .3
+            size_hint_x: .2
             Button:
                 text: "Удалить"
                 on_release: root.del_choice_karta_func(karta_num.text)

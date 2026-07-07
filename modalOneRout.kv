@@ -6,7 +6,7 @@
         MDBoxLayout:
             size_hint: 1,.07
             MDBoxLayout:
-                size_hint_x: .35
+                size_hint_x: .4
                 md_bg_color: 1,0,0,.5
                 TitleLabel:
                     text: "Будние"
@@ -21,13 +21,13 @@
                     color: "white"
                     valign: "top" # ?????????????????????????????????????????
             MDBoxLayout:
-                size_hint_x: .35
+                size_hint_x: .4
                 md_bg_color: "blue"
                 TitleLabel:
                     text: "Выходные"
                     color: "white"
             MDBoxLayout:
-                size_hint_x: .3
+                size_hint_x: .25
                 md_bg_color: "green"
                 TitleLabel:
                     text: "Удалить\n карту"
@@ -50,6 +50,8 @@
             size_hint: 1,.07
             DelButton:
                 id: delbutton
+                bold: True
+
                 text:"Удалить маршрут"
 
 

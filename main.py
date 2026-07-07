@@ -254,34 +254,34 @@ class Timebox_main(MDScreen):
 
     def install_weekday_1sm(self,time_rout_lst:list):
         try:
-            self.start_hours_day_1sm = time_rout_lst[0]
-            self.start_minutes_day_1sm = time_rout_lst[1]
-            self.finish_hours_day_1sm = time_rout_lst[2]
-            self.finish_minutes_day_1sm = time_rout_lst[3]
+            self.start_hours_day_1sm = time_rout_lst[0].zfill(2)
+            self.start_minutes_day_1sm = time_rout_lst[1].zfill(2)
+            self.finish_hours_day_1sm = time_rout_lst[2].zfill(2)
+            self.finish_minutes_day_1sm = time_rout_lst[3].zfill(2)
         except IndexError:
             pass
     def install_weekday_2sm(self,time_rout_lst:list):
         try:
-            self.start_hours_day_2sm = time_rout_lst[0]
-            self.start_minutes_day_2sm = time_rout_lst[1]
-            self.finish_hours_day_2sm = time_rout_lst[2]
-            self.finish_minutes_day_2sm = time_rout_lst[3]
+            self.start_hours_day_2sm = time_rout_lst[0].zfill(2)
+            self.start_minutes_day_2sm = time_rout_lst[1].zfill(2)
+            self.finish_hours_day_2sm = time_rout_lst[2].zfill(2)
+            self.finish_minutes_day_2sm = time_rout_lst[3].zfill(2)
         except IndexError:
             pass
     def install_weekend_1sm(self,time_rout_lst:list):
         try:
-            self.start_hours_end_1sm = time_rout_lst[0]
-            self.start_minutes_end_1sm = time_rout_lst[1]
-            self.finish_hours_end_1sm = time_rout_lst[2]
-            self.finish_minutes_end_1sm = time_rout_lst[3]
+            self.start_hours_end_1sm = time_rout_lst[0].zfill(2)
+            self.start_minutes_end_1sm = time_rout_lst[1].zfill(2)
+            self.finish_hours_end_1sm = time_rout_lst[2].zfill(2)
+            self.finish_minutes_end_1sm = time_rout_lst[3].zfill(2)
         except IndexError:
             pass
     def install_weekend_2sm(self,time_rout_lst:list):
         try:
-            self.start_hours_end_2sm = time_rout_lst[0]
-            self.start_minutes_end_2sm = time_rout_lst[1]
-            self.finish_hours_end_2sm = time_rout_lst[2]
-            self.finish_minutes_end_2sm = time_rout_lst[3]
+            self.start_hours_end_2sm = time_rout_lst[0].zfill(2)
+            self.start_minutes_end_2sm = time_rout_lst[1].zfill(2)
+            self.finish_hours_end_2sm = time_rout_lst[2].zfill(2)
+            self.finish_minutes_end_2sm = time_rout_lst[3].zfill(2)
         except IndexError:
             pass
 
@@ -303,6 +303,14 @@ class Page_main(MDScreen):
 
     def __init__(self, **kwargs):
         MDScreen.__init__(self, **kwargs)
+        self.bind(size=self.func)
+
+
+    def func(self,a,b):
+        print(Window.size)
+
+
+
 
     def top_button(self):
         if DICT_ROUTE:
@@ -492,13 +500,17 @@ class MyPopup_save_only(Popup):
         self.my_size = "20sp"
         if rout_25:
             self.lab_text = (f"Можно сохранить только [size={self.my_size}]25[/size] маршрутов.\n"
-                              "Для удаления маршрута перейдите во вкладку\n"
-                             "[color=#006400]'маршруты'[/color], выберите маршрут и нажмите\n"
-                             "внизу экрана кнопку [color=#A52A2A]'удалить маршрут'[/color].")
-        elif karts_19:
-            self.lab_text = (f"Можно сохранить только [size={self.my_size}]19[/size] карт на маршрут.\n"
-                             "Для переопределения карты введите новые\n"
-                             "данные и согласитесь на изменения")
+                              "Для удаления маршрута перейдите во\n"
+                             "вкладку [color=#006400]'маршруты'[/color], выберите маршрут\n "
+                             "и нажмите внизу экрана кнопку\n "
+                             "     [color=#A52A2A]'удалить маршрут'[/color].")
+        elif karts_19:         # 12345678901234567890123456789012345
+            self.lab_text = (f"Можно сохранить только [size={self.my_size}]19[/size] карт\n"
+                             f"на маршрут. Для переопределения карты\n"
+                             f"введите новые данные и согласитесь\n"
+                             f"на изменения. Для удаления карты\n"
+                             f"перейдите во вкладку [color=#006400]'маршруты'[/color],\n"
+                             f"выберите маршрут, удалите карту.")
         self.open()
 
 
