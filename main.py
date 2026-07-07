@@ -5,6 +5,7 @@ from datetime import timedelta
 import pickle
 from pprint import pprint
 from math import ceil
+import threading
 
 from kivy.uix.button import Button
 
@@ -17,7 +18,7 @@ from kivymd.uix.screen import MDScreen
 from kivy.uix.popup import Popup
 from kivy.lang.builder import Builder
 from kivy.core.window import Window
-from kivy.clock import Clock
+from kivy.clock import Clock, mainthread
 from kivymd.app import MDApp
 
 SEK_CLOCK:int = 2
@@ -242,6 +243,7 @@ class Timebox_main(MDScreen):
 
 
     def parsing_time_routs(self):
+        print("second thread")
         time_rout = DICT_ROUTE[self.choice_rout]
         WEEKDAY_1sm = time_rout[0]
         WEEKDAY_2sm = time_rout[1]
@@ -961,13 +963,15 @@ class ModalViewOneRout(ModalView):
         self.all_choices_routs_sort:list = screening_out(self.choice_route_button)
         self.border_y = 1
         self.pos_hint = {"center": 1, "y": self.border_y}
-        self.installing_data_choice_route()
+        threading.Thread(target=self.installing_data_choice_route).start()
+        # self.installing_data_choice_route()
 
     def _handle_keyboard(self, _window, key, *_args):
         if key == 27:
             Clock.schedule_interval(self.my_close_callback, .04)
             return True
 
+    @mainthread
     def installing_data_choice_route(self):
         self.num_rout = self.choice_route_button # Установка номера маршрута в заглавие
         for kart in self.all_choices_routs_sort:
