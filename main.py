@@ -1,10 +1,9 @@
-
 import time
 import os
 from sys import exit as sysexit
 from datetime import timedelta
 import pickle
-# from pprint import pprint
+from pprint import pprint
 from math import ceil
 import threading
 
@@ -107,12 +106,12 @@ DICT_TIME = load_HDDfile(WORK_TIME_FILE)
 DICT_ROUTE = load_HDDfile(ROUTE_FILE)
 
 
-# print("####### DICT_TIME ############")
-# pprint(DICT_TIME)
-# print("+++++++++++++++++++++++++++++++++")
-# print("####### DICT_ROUTE #############")
-# pprint(DICT_ROUTE)
-# print("+++++++++++++++++++++++++++++++++")
+print("####### DICT_TIME ############")
+pprint(DICT_TIME)
+print("+++++++++++++++++++++++++++++++++")
+print("####### DICT_ROUTE #############")
+pprint(DICT_ROUTE)
+print("+++++++++++++++++++++++++++++++++")
 
 month_lst = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
              'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь']
@@ -255,90 +254,7 @@ class PagesManager(MDScreenManager):
 
 
 
-class Timebox_main(MDScreen):
-    num_karta = StringProperty()
 
-    start_hours_day_1sm = StringProperty("-")
-    start_minutes_day_1sm = StringProperty("-")
-    finish_hours_day_1sm = StringProperty("-")
-    finish_minutes_day_1sm = StringProperty("-")
-
-    start_hours_day_2sm = StringProperty("-")
-    start_minutes_day_2sm = StringProperty("-")
-    finish_hours_day_2sm = StringProperty("-")
-    finish_minutes_day_2sm = StringProperty("-")
-
-    start_hours_end_1sm = StringProperty("-")
-    start_minutes_end_1sm = StringProperty("-")
-    finish_hours_end_1sm = StringProperty("-")
-    finish_minutes_end_1sm = StringProperty("-")
-
-    start_hours_end_2sm = StringProperty("-")
-    start_minutes_end_2sm = StringProperty("-")
-    finish_hours_end_2sm = StringProperty("-")
-    finish_minutes_end_2sm = StringProperty("-")
-
-
-
-    Builder.load_file(os.path.join(dir_name, "main_timebox.kv"))
-    def __init__(self,choice_rout:str, **kwargs):
-        MDScreen.__init__(self, **kwargs)
-        self.choice_rout:str = choice_rout # 22/7
-        self.num_karta = choice_rout.split("/")[1]
-        self.my_id = self.num_karta
-        self.parsing_time_routs()
-
-    def del_choice_karta_func(self,del_karta):
-        self.parent.remove_widget(self)
-        del_route = self.choice_rout.split("/")[0]
-        del_key = (del_route+"/"+del_karta)
-        del DICT_ROUTE[del_key]
-        save_HDD_DICT(DICT_ROUTE,ROUTE_FILE)
-
-
-    def parsing_time_routs(self):
-        time_rout = DICT_ROUTE[self.choice_rout]
-        WEEKDAY_1sm = time_rout[0]
-        WEEKDAY_2sm = time_rout[1]
-        WEEKEND_1sm = time_rout[2]
-        WEEKEND_2sm = time_rout[3]
-        self.install_weekday_1sm(WEEKDAY_1sm)
-        self.install_weekday_2sm(WEEKDAY_2sm)
-        self.install_weekend_1sm(WEEKEND_1sm)
-        self.install_weekend_2sm(WEEKEND_2sm)
-
-    def install_weekday_1sm(self,time_rout_lst:list):
-        try:
-            self.start_hours_day_1sm = time_rout_lst[0].zfill(2)
-            self.start_minutes_day_1sm = time_rout_lst[1].zfill(2)
-            self.finish_hours_day_1sm = time_rout_lst[2].zfill(2)
-            self.finish_minutes_day_1sm = time_rout_lst[3].zfill(2)
-        except IndexError:
-            pass
-    def install_weekday_2sm(self,time_rout_lst:list):
-        try:
-            self.start_hours_day_2sm = time_rout_lst[0].zfill(2)
-            self.start_minutes_day_2sm = time_rout_lst[1].zfill(2)
-            self.finish_hours_day_2sm = time_rout_lst[2].zfill(2)
-            self.finish_minutes_day_2sm = time_rout_lst[3].zfill(2)
-        except IndexError:
-            pass
-    def install_weekend_1sm(self,time_rout_lst:list):
-        try:
-            self.start_hours_end_1sm = time_rout_lst[0].zfill(2)
-            self.start_minutes_end_1sm = time_rout_lst[1].zfill(2)
-            self.finish_hours_end_1sm = time_rout_lst[2].zfill(2)
-            self.finish_minutes_end_1sm = time_rout_lst[3].zfill(2)
-        except IndexError:
-            pass
-    def install_weekend_2sm(self,time_rout_lst:list):
-        try:
-            self.start_hours_end_2sm = time_rout_lst[0].zfill(2)
-            self.start_minutes_end_2sm = time_rout_lst[1].zfill(2)
-            self.finish_hours_end_2sm = time_rout_lst[2].zfill(2)
-            self.finish_minutes_end_2sm = time_rout_lst[3].zfill(2)
-        except IndexError:
-            pass
 
 
 
@@ -358,6 +274,11 @@ class Page_main(MDScreen):
 
     def __init__(self, **kwargs):
         MDScreen.__init__(self, **kwargs)
+
+    def showDCT(self):
+        pprint(DICT_TIME)
+
+
 
     def top_button(self):
         if DICT_ROUTE:
@@ -490,12 +411,17 @@ class Page_main(MDScreen):
         if KEY not in DICT_TIME:
             DICT_TIME[KEY] = (route_and_karta_in_day,
                               (self.total_hours_work, self.total_minutes_work),
-                              all_time_user_input)
+                               all_time_user_input
+                              )
             save_HDD_DICT(DICT_TIME, WORK_TIME_FILE)
             self.change_save_text_label()
         else:
-            MyPopup_save_new_workday(KEY, route_and_karta_in_day, (self.total_hours_work, self.total_minutes_work),
-                                     all_time_user_input, label_save_text)
+            MyPopup_save_new_workday(KEY, route_and_karta_in_day,
+                        (self.total_hours_work,
+                                    self.total_minutes_work),
+                                     all_time_user_input,
+                                     label_save_text
+                                     )
 
 
 
@@ -535,6 +461,93 @@ class Page_main(MDScreen):
         # self.label.theme_text_color = "Custom"
         self.ids.savingtext.text_color = "red"
         self.ids.savingtext.text = "Сохранено"
+
+class Timebox_main(MDScreen):
+    num_karta = StringProperty()
+
+    start_hours_day_1sm = StringProperty("-")
+    start_minutes_day_1sm = StringProperty("-")
+    finish_hours_day_1sm = StringProperty("-")
+    finish_minutes_day_1sm = StringProperty("-")
+
+    start_hours_day_2sm = StringProperty("-")
+    start_minutes_day_2sm = StringProperty("-")
+    finish_hours_day_2sm = StringProperty("-")
+    finish_minutes_day_2sm = StringProperty("-")
+
+    start_hours_end_1sm = StringProperty("-")
+    start_minutes_end_1sm = StringProperty("-")
+    finish_hours_end_1sm = StringProperty("-")
+    finish_minutes_end_1sm = StringProperty("-")
+
+    start_hours_end_2sm = StringProperty("-")
+    start_minutes_end_2sm = StringProperty("-")
+    finish_hours_end_2sm = StringProperty("-")
+    finish_minutes_end_2sm = StringProperty("-")
+
+
+
+    Builder.load_file(os.path.join(dir_name, "main_timebox.kv"))
+    def __init__(self,choice_rout:str, **kwargs):
+        MDScreen.__init__(self, **kwargs)
+        self.choice_rout:str = choice_rout # 22/7
+        self.num_karta = choice_rout.split("/")[1]
+        self.my_id = self.num_karta
+        self.parsing_time_routs()
+
+    def del_choice_karta_func(self,del_karta):
+        self.parent.remove_widget(self)
+        del_route = self.choice_rout.split("/")[0]
+        del_key = (del_route+"/"+del_karta)
+        del DICT_ROUTE[del_key]
+        save_HDD_DICT(DICT_ROUTE,ROUTE_FILE)
+
+
+    def parsing_time_routs(self):
+        time_rout = DICT_ROUTE[self.choice_rout]
+        WEEKDAY_1sm = time_rout[0]
+        WEEKDAY_2sm = time_rout[1]
+        WEEKEND_1sm = time_rout[2]
+        WEEKEND_2sm = time_rout[3]
+        self.install_weekday_1sm(WEEKDAY_1sm)
+        self.install_weekday_2sm(WEEKDAY_2sm)
+        self.install_weekend_1sm(WEEKEND_1sm)
+        self.install_weekend_2sm(WEEKEND_2sm)
+
+    def install_weekday_1sm(self,time_rout_lst:list):
+        try:
+            self.start_hours_day_1sm = time_rout_lst[0].zfill(2)
+            self.start_minutes_day_1sm = time_rout_lst[1].zfill(2)
+            self.finish_hours_day_1sm = time_rout_lst[2].zfill(2)
+            self.finish_minutes_day_1sm = time_rout_lst[3].zfill(2)
+        except IndexError:
+            pass
+    def install_weekday_2sm(self,time_rout_lst:list):
+        try:
+            self.start_hours_day_2sm = time_rout_lst[0].zfill(2)
+            self.start_minutes_day_2sm = time_rout_lst[1].zfill(2)
+            self.finish_hours_day_2sm = time_rout_lst[2].zfill(2)
+            self.finish_minutes_day_2sm = time_rout_lst[3].zfill(2)
+        except IndexError:
+            pass
+    def install_weekend_1sm(self,time_rout_lst:list):
+        try:
+            self.start_hours_end_1sm = time_rout_lst[0].zfill(2)
+            self.start_minutes_end_1sm = time_rout_lst[1].zfill(2)
+            self.finish_hours_end_1sm = time_rout_lst[2].zfill(2)
+            self.finish_minutes_end_1sm = time_rout_lst[3].zfill(2)
+        except IndexError:
+            pass
+    def install_weekend_2sm(self,time_rout_lst:list):
+        try:
+            self.start_hours_end_2sm = time_rout_lst[0].zfill(2)
+            self.start_minutes_end_2sm = time_rout_lst[1].zfill(2)
+            self.finish_hours_end_2sm = time_rout_lst[2].zfill(2)
+            self.finish_minutes_end_2sm = time_rout_lst[3].zfill(2)
+        except IndexError:
+            pass
+
+
 
 class MyPopup_save_only(Popup):
     lab_text = StringProperty()
@@ -619,10 +632,16 @@ class MyPopup_save_new_workday(Popup):
     curr_data = StringProperty()
     route_str = StringProperty()
     karta_str = StringProperty()
-    start_work = StringProperty()
-    end_work = StringProperty()
-    start_lunch = StringProperty()
-    end_lunch = StringProperty()
+
+    old_start_work = StringProperty()
+    old_end_work = StringProperty()
+    old_start_lunch = StringProperty()
+    old_end_lunch = StringProperty()
+
+    current_start_work = StringProperty()
+    current_end_work = StringProperty()
+    current_start_lunch = StringProperty()
+    current_end_lunch = StringProperty()
 
     Builder.load_file(os.path.join(dir_name, "popup_new_day.kv"))
     def __init__(self,date,route,tot_work_time,lst_time, lab,**kwargs):
@@ -640,14 +659,23 @@ class MyPopup_save_new_workday(Popup):
     def install_time_work_in_labels(self):
         route_and_karta = DICT_TIME[self.KEY][0]
         self.route_str, self.karta_str = get_route(route_and_karta)
-        list_time = DICT_TIME[self.KEY][2]
-        self.start_work = checking_the_time(list_time[0],list_time[1])
-        self.end_work = checking_the_time(list_time[2],list_time[3])
-        self.start_lunch = checking_the_time(list_time[4],list_time[5])
-        self.end_lunch = checking_the_time(list_time[6],list_time[7])
+        old_list_time = DICT_TIME[self.KEY][2]
+
+        self.old_start_work = self.current_start_work = checking_the_time(old_list_time[0], old_list_time[1])
+        self.old_end_work = checking_the_time(old_list_time[2], old_list_time[3])
+        self.old_start_lunch = checking_the_time(old_list_time[4], old_list_time[5])
+        self.old_end_lunch = checking_the_time(old_list_time[6], old_list_time[7])
+
+
+        self.current_start_work = checking_the_time(self.list_time[0], self.list_time[1])
+        self.current_end_work = checking_the_time(self.list_time[2], self.list_time[3])
+        self.current_start_lunch = checking_the_time(self.list_time[4], self.list_time[5])
+        self.current_end_lunch = checking_the_time(self.list_time[6], self.list_time[7])
+
+
 
     def answer_ok(self):
-        DICT_TIME[self.KEY] = (self.route, self.total_work_time, self.list_time)
+        DICT_TIME[self.KEY] = (self.route, self.total_work_time,self.list_time)
         save_HDD_DICT(DICT_TIME, WORK_TIME_FILE)
         self.change_save_text_label()
         self.dismiss()
