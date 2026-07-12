@@ -1,31 +1,19 @@
 #:kivy 2.3.1
 #: import sys sys
-
-
 <Button_main@MDButton>
     theme_bg_color: "Custom"
-    # theme_color: "Custom"
     md_bg_color: .1,.1,.1, 1
     style: "outlined"
     radius:5
-    # md_bg_color: "red"
-    # md_bg_color: "green"
-    # style: "elevated" 'md_bg_color_disabled' 'on_md_bg_color'
-    # style: "filled"
-    # style: "tonal"
-    # style: "text"
-    # pos_hint: {"bottom": 1}
     theme_width: "Custom"
     theme_height: "Custom"
     size_hint: (1,.9)
-
 <Button_text@MDButtonText>
     pos_hint: {"center_x": 1,"center_y": 1}
     theme_text_color: "Custom"
     text_color: "white"
     theme_font_size: "Custom"
     font_size: sp(20)
-
 <TimeBox@MDBoxLayout>
     orientation: "vertical"
     padding: dp(5)
@@ -37,15 +25,12 @@
             rectangle: self.x,self.y,self.width,self.height
 <TimeSpinner@Spinner>
     font_size: sp(30)
-    color: 1,1,1,.8    # "#FF4500"
-    background_color: app.theme_cls.primaryColor # "black"
+    color: 1,1,1,.8
+    background_color: app.theme_cls.primaryColor
     bold: True
-
 <TitleLabel@MDLabel>
     markup: True
     size_hint: 1, 1
-    # font_size: 30
-    #color: 0,0,0
     font_style: "Title"
     role: "small"
     bold: True
@@ -73,7 +58,6 @@
                 halign: "center"
                 valign: "center"
                 on_release: root.top_button()
-
         MDBoxLayout:
             id: TOP_box
             padding: [dp(10),dp(10),dp(10),0]
@@ -96,7 +80,6 @@
                                     text: "Дата"
                                     role: "large"
                                     halign: "center"
-
                         MDBoxLayout:
                             size_hint_x: .4
                             TimeSpinner:
@@ -135,12 +118,10 @@
                                 id: startworkminutes
                                 size_hint_y: 1
                                 on_text: root.calculation_of_working()
-
                 TimeBox:
                     size_hint_y: .2
                     MDBoxLayout:
                         orientation: "vertical"
-
                         MDBoxLayout:
                             TitleLabel:
                                 text: "[color=#2E8B40]КОНЕЦ\n рабочего дня[/color]"
@@ -151,7 +132,6 @@
                                 id: hoursendwork
                                 size_hint_y: 1
                                 on_text: root.calculation_of_working()
-
                         TitleLabel:
                             size_hint: .1, 1
                             text: ":"
@@ -161,7 +141,6 @@
                                 id: minutesendwork
                                 size_hint_y: 1
                                 on_text: root.calculation_of_working()
-
                 TimeBox:
                     size_hint_y: .3
                     MDBoxLayout:
@@ -188,7 +167,6 @@
                             text: "часов"
                             bold: False
                             halign: "left"
-
                     MDBoxLayout:
                         size_hint_y: .25
                         TitleLabel:
@@ -200,9 +178,6 @@
                             size_hint_x: .5
                             text: "мин."
                             bold: False
-
-
-
             MDBoxLayout:
                 id: right_box
                 orientation: "vertical"
@@ -222,7 +197,6 @@
                                 mode: "outlined"
                                 multiline: False
                                 on_text: root.search_rout_in_dict()
-
                         MDBoxLayout:
                             KartaTextInput:
                                 parent_color: app.theme_cls.primaryContainerColor
@@ -235,7 +209,6 @@
                                 mode: "outlined"
                                 multiline: False
                                 on_text: root.search_rout_in_dict()
-
                     TimeBox:
                         size_hint_x: .3
                         ToggleButton:
@@ -246,7 +219,6 @@
                             bold: True
                             font_size: sp(35)
                             on_press: self.font_size=sp(35); sm_2.font_size = sp(15)
-                            # on_release: self.font_size=sp(30)
                         TitleLabel:
                             size_hint_y: .5
                             text: "смена"
@@ -259,12 +231,6 @@
                             group:'smena'
                             bold: True
                             on_press: self.font_size=sp(35); sm_1.font_size = sp(15)
-
-
-
-
-
-
                 TimeBox:
                     padding: dp(5)
                     MDBoxLayout:
@@ -286,9 +252,6 @@
                                 id: minutesstartlunch
                                 size_hint_y: 1
                                 on_text: root.calculation_of_working()
-
-
-
                 TimeBox:
                     padding: dp(5)
                     orientation: "vertical"
@@ -305,28 +268,22 @@
                         TitleLabel:
                             size_hint: .1, 1
                             text: ":"
-
                         MDBoxLayout:
                             MinutesTextInput:
                                 parent_color: app.theme_cls.primaryContainerColor
                                 id: minutesendlunch
                                 size_hint_y: 1
                                 on_text: root.calculation_of_working()
-
                 TimeBox:
                     padding: dp(5)
                     spacing: dp(10)
                     orientation: "vertical"
                     MDBoxLayout:
                         Button_main:
-                            on_release: root.show_statistic() # root.show_DICT();
+                            on_release: root.show_statistic()
                             Button_text:
-                                # text_size: self.size
                                 pos_hint: {"center_x": .5,"center_y": .5}
                                 text: "Статистика"
-#                                halign: "center"
-#                                valign: "center"
-
                     MDBoxLayout:
                         orientation: "vertical"
                         size_hint:1,1
@@ -341,11 +298,6 @@
                                 text: "Создать\nмаршрут"
                                 halign: "center"
                                 valign: "center"
-
-
-
-
-
         MDBoxLayout:
             id: BOTTOM_box
             padding: [dp(10),dp(10),dp(10),0]
@@ -374,7 +326,6 @@
                         Button_text:
                             pos_hint: {"right": .7,"center_y": .5}
                             text: "Выход"
-
             MDBoxLayout:
                 size_hint:(1,.1)
                 TitleLabel:

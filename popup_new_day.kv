@@ -1,7 +1,5 @@
 #:kivy 2.3.1
-
 <MyPopup_save_new_workday>:
-    box_answer_ok:box_answer_ok
     size_hint: (.9,.5)
     pos_hint: {"x_center": 1,"y": .5}
     title: "Внимание!"
@@ -11,7 +9,6 @@
     separator_color: "blue"
     MDBoxLayout:
         orientation: "vertical"
-
         MDBoxLayout:
             orientation: "vertical"
             # old time box
@@ -24,9 +21,8 @@
                     halign: "center"
                     color: 1,1,1
                 MDBoxLayout:
-                    id:route_and_karta
                     TitleLabel:
-                        text: f"Маршрут  [size=20sp][color=#B22222]{root.route_str}[/color][/size]  карта  [size=20sp][color=#B22222]{root.karta_str}[/color][/size]"
+                        text: f"Маршрут  [size=20sp][color=#B22222]{root.old_route_str}[/color][/size]  карта  [size=20sp][color=#B22222]{root.old_karta_str}[/color][/size]"
                         halign: "center"
                         color: 1,1,1
             MDBoxLayout:
@@ -71,16 +67,20 @@
                         role: "small"
                         halign: "left"
         MDBoxLayout:
-            size_hint_y: .15
+            size_hint_y: .2
             TitleLabel:
                 text: "Хотите заменить на:"
                 color: 1,0,0
                 role: "large"
-
+        MDBoxLayout:
+            size_hint_y: .2
+            TitleLabel:
+                text: f"Маршрут  [size=20sp][color=#B22222]{root.current_route_str}[/color][/size]  карта  [size=20sp][color=#B22222]{root.current_karta_str}[/color][/size]"
+                halign: "center"
+                color: 1,1,1
         MDBoxLayout:
             size_hint_y: .3
             orientation: "vertical"
-            # new time box
             MDBoxLayout:
                 size_hint_y: .4
                 TitleLabel:
@@ -122,16 +122,9 @@
                         color: 1,1,1
                         role: "small"
                         halign: "left"
-
-            MDBoxLayout:
-                size_hint_y:.3
-
-
         MDBoxLayout:
             orientation: "vertical"
-            # save time box
-            size_hint_y:.3
-
+            size_hint_y:.2
             MDBoxLayout:
                 id: box_answer_ok
                 size_hint_y: .2
