@@ -20,6 +20,16 @@ from kivy.core.window import Window
 from kivy.clock import Clock, mainthread
 from kivymd.app import MDApp
 
+from kivy.utils import platform
+if platform == 'android':
+    from android import mActivity
+    context = mActivity.getApplicationContext()
+    result = context.getExternalFilesDir(None)
+    real_path = str(result.toString())
+
+
+
+
 SEK_CLOCK: int = 2
 
 WORK_TIME_FILE = "worktime_data.dat"
@@ -27,85 +37,30 @@ ROUTE_FILE = "routes_data.dat"
 
 """Директория main.py"""
 dir_name = os.getcwd()
-file_dir_name = "/storage/emulated/0/Documents"
-
-
-def open_HDDfile_from_doc(open_file):
-    print(f"Открываю в :{file_dir_name} ", open_file)
-    with open(os.path.join(file_dir_name, open_file), 'rb') as file:
-        file_dict = pickle.load(file)
-        print(f"Успешно открыт в open_HDDfile_from_doc :{file_dir_name} ", open_file)
-        return file_dict
-
-
-def open_HDDfile_from_root(open_file):
-    print(f"Не открылся в : {file_dir_name} ", open_file)
-    with open(os.path.join(dir_name, open_file), 'rb') as file:
-        file_dict = pickle.load(file)
-        print(f"Успешно открыт в open_HDDfile_from_root {dir_name}: ", open_file)
-        return file_dict
-
-
-def create_new_HDDfile_in_doc(open_file):
-    print(f"Не открылся в : {dir_name} ", open_file)
-    print(f"Создаём новый в {file_dir_name}")
-    with open(os.path.join(file_dir_name, open_file), 'wb') as obj:
-        file_dict = {}
-        pickle.dump(file_dict, obj)
-        print(f"Успешно создан пустой в def create_new_HDDfile_in_doc :{file_dir_name} ", open_file)
-        return file_dict
-
-
-def create_new_HDDfile_in_root(open_file):
-    print(f"Не записался в :{file_dir_name} ", open_file)
-    with open(os.path.join(dir_name, open_file), 'wb') as obj:
-        file_dict = {}
-        pickle.dump(file_dict, obj)
-        print(f"Файл записан в корневую папку программы: {dir_name}")
-        return file_dict
-
 
 def load_HDDfile(open_file):
     try:
-        file_dict = open_HDDfile_from_doc(open_file)
+        with open(os.path.join(real_path, open_file), 'rb') as file:
+            file_dict = pickle.load(file)
         return file_dict
-    except Exception as err:
-        print("def load_HDDfile +", err, "+++")
-        try:
-            file_dict = open_HDDfile_from_root(open_file)
+    except FileNotFoundError as err:
+        print(f"Ошибка load_HDDfile :",err)
+        print(f"Создаём новый в {real_path}")
+        with open(os.path.join(real_path, open_file), 'wb') as obj:
+            file_dict = {}
+            pickle.dump(file_dict, obj)
             return file_dict
-        except Exception as err:
-            print("def load_HDDfile +", err, "+++")
-            try:
-                file_dict = create_new_HDDfile_in_doc(open_file)
-                return file_dict
-            except Exception as err:
-                print("def load_HDDfile +", err, "+++")
-                file_dict = create_new_HDDfile_in_root(open_file)
-                return file_dict
-
 
 def save_HDD_DICT(dictionary: dict, name_file: str):
     try:
-        with open(os.path.join(file_dir_name, name_file), 'wb') as file:
+        with open(os.path.join(real_path, name_file), 'wb') as file:
             pickle.dump(dictionary, file)
-            print(f"Файл успешно записан в :{file_dir_name}")
     except Exception as err:
         print("Ошибка save_HDD_DICT: ", err)
-        print(f"Файл записан в корневую папку программы.{dir_name}")
-        with open(os.path.join(dir_name, name_file), 'wb') as file:
-            pickle.dump(dictionary, file)
 
 
 DICT_TIME = load_HDDfile(WORK_TIME_FILE)
 DICT_ROUTE = load_HDDfile(ROUTE_FILE)
-
-# print("####### DICT_TIME ############")
-# pprint(DICT_TIME)
-# print("+++++++++++++++++++++++++++++++++")
-# print("####### DICT_ROUTE #############")
-# pprint(DICT_ROUTE)
-# print("+++++++++++++++++++++++++++++++++")
 
 month_lst = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
              'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь']
@@ -1050,7 +1005,7 @@ class ModalViewOneRout(ModalView):
         self.all_choices_routs_sort: list = screening_out(self.choice_route_button)
         self.border_y = 1
         self.pos_hint = {"center": 1, "y": self.border_y}
-        threading.Thread(target=self.installing_data_choice_route).start()
+        threading.Thread(target=self.installing_data_choice_route,daemon=True).start()
         # self.installing_data_choice_route()
 
     def _handle_keyboard(self, _window, key, *_args):
@@ -1068,7 +1023,7 @@ class ModalViewOneRout(ModalView):
         Clock.schedule_interval(self.my_open_callback, .05)
 
     def on_open(self):
-        threading.Thread(target=self.open_modal_view).start()
+        threading.Thread(target=self.open_modal_view,daemon=True).start()
 
     def my_open_callback(self, dt):
         self.pos_hint = {"center": 1, "y": self.border_y}
