@@ -1,5 +1,6 @@
 import time
 import os
+from pprint import pprint
 from sys import exit as sysexit
 from datetime import timedelta
 import pickle
@@ -7,6 +8,12 @@ from math import ceil
 import threading
 
 from kivy.uix.button import Button
+from kivymd.uix.boxlayout import MDBoxLayout
+from kivymd.uix.label import MDLabel
+
+from kivy.graphics import Color
+from kivy.graphics import Line
+from kivy.graphics import Rectangle
 
 from kivy.properties import ListProperty, StringProperty
 from kivymd.uix.screenmanager import MDScreenManager
@@ -26,7 +33,8 @@ if platform == 'android':
     context = mActivity.getApplicationContext()
     result = context.getExternalFilesDir(None)
     real_path = str(result.toString())
-
+else:
+    real_path = ''
 
 
 
@@ -62,6 +70,12 @@ def save_HDD_DICT(dictionary: dict, name_file: str):
 DICT_TIME = load_HDDfile(WORK_TIME_FILE)
 DICT_ROUTE = load_HDDfile(ROUTE_FILE)
 
+pprint(DICT_TIME)
+# pprint(DICT_ROUTE)
+
+
+
+
 month_lst = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
              'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь']
 
@@ -88,6 +102,7 @@ def screening_out(route: str) -> list:
 
 
 def get_set_all_route() -> list:
+    """Получение всех маршрутов"""
     set_route = []
     for route in DICT_ROUTE:
         set_route.append(route.split("/")[0])
@@ -125,6 +140,7 @@ def get_all_dates_from_choice_month(choice_month) -> list:
 
 
 def checking_the_time(hours, minutes):
+    """Проверка ввода времени"""
     if hours.isdigit() and minutes.isdigit():
         return hours.zfill(2) + ":" + minutes.zfill(2)
     else:
@@ -243,7 +259,7 @@ class Page_main(MDScreen):
 
     def show_statistic(self):
         current_date = self.get_user_choice_date()
-        MyPopup_page_stat(current_date).open()
+        Modal_page_stat(current_date).open()
 
     def change_data(self):
         day = self.ids.spinner_day.text
@@ -742,7 +758,7 @@ class MyPopup_change_route(Popup):
         self.label_savetext.text = "Сохранено"
 
 
-class MyPopup_page_stat(Popup):
+class Modal_page_stat(ModalView):
     curr_date = StringProperty()
     title = StringProperty()
     quant_day = StringProperty()
@@ -752,10 +768,10 @@ class MyPopup_page_stat(Popup):
     tot_min = StringProperty()
     karta_hours = StringProperty()
     karta_min = StringProperty()
-    Builder.load_file(os.path.join(dir_name, "popup_statistic.kv"))
+    Builder.load_file(os.path.join(dir_name, "modal_statistic.kv"))
 
     def __init__(self, title_date, **kwargs):
-        Popup.__init__(self, **kwargs)
+        ModalView.__init__(self, **kwargs)
         self.title = title_date.split()[1]
         self.curr_date = title_date
         self.overlay_color = [0, 0, 0, .9]  # Затемнение root-экрана
@@ -769,6 +785,15 @@ class MyPopup_page_stat(Popup):
         self.tot_min = str(total_worktime[1])
         self.route, self.karta = get_karta(self.curr_date)
         self.karta_hours, self.karta_min = get_karta_worktime(self.curr_date)
+
+
+    def full_grid_routs(self):
+        self.ids.root_stat_box.clear_widgets()
+        self.size_hint = (1,1)
+        self.ids.root_stat_box.add_widget(StatGridLayout(self.title))
+
+
+
 
 
 class RouteTextInput(MDTextField):
@@ -896,6 +921,59 @@ class MinutesTextInput(MDTextField):
                 self.parent.md_bg_color = self.parent_color
                 self.font_size = "18sp"
                 self.text = "Мин"
+
+
+class StatLabel(MDLabel):
+    def __init__(self, **kwargs):
+        MDLabel.__init__(self, **kwargs)
+        self.md_bg_color = (.6,.6,.6)
+        self.halign = "center"
+
+
+class StatGridLayout(MDGridLayout):
+    """      '12 Июль': ('16/1',
+             ('13', '05'),
+             ['06', '07', '20', '11', '13', '10', '14', '09']),
+        SWHour => Start Work Hour
+        EWMin => End Work Minutes """
+    def __init__(self, month, **kwargs):
+        MDGridLayout.__init__(self, **kwargs)
+        self.cols = 4
+        self.rows = 31
+        self.month = month
+        self.list_all_date = get_all_dates_from_choice_month(month)
+        self.parsing_dict_route()
+
+    def getrouteandkarta(self,route_and_karta):
+        try:
+            route, karta = route_and_karta.split("/")
+            return route, karta
+        except ValueError:
+            route, karta = "---", "--"
+            return route, karta
+
+
+    def parsing_dict_route(self):
+        for num_date in range(1,32):
+            DATE = str(num_date) + " " + self.month
+            num_date = MDLabel(text=f'{num_date}',size_hint_x= .1,bold=True)
+            self.add_widget(num_date)
+            if DATE in self.list_all_date:
+                num_date.md_bg_color = (.6,.6,.6)
+                route,karta = self.getrouteandkarta(DICT_TIME[DATE][0])
+                hours,minutes = DICT_TIME[DATE][1]
+                SWHour = DICT_TIME[DATE][2][0]
+                SWMin = DICT_TIME[DATE][2][1]
+                EWHour = DICT_TIME[DATE][2][2]
+                EWMin = DICT_TIME[DATE][2][3]
+                self.add_widget(StatLabel(font_size=25, text=f'{route}/[color=#006400]{karta}[/color]',
+                                          bold= True, size_hint_x= .2, markup=True))
+                self.add_widget(StatLabel(text=f"{SWHour}:{SWMin} - {EWHour}:{EWMin}", size_hint_x=.4))
+                self.add_widget(StatLabel(text=f"{hours} ч {minutes} мин", size_hint_x=.3))
+            else:
+                self.add_widget(MDLabel(text="", size_hint_x=.2))
+                self.add_widget(MDLabel(text="", size_hint_x=.4))
+                self.add_widget(MDLabel(text="", size_hint_x=.3))
 
 
 class Grid_for_All_Routs(MDGridLayout):
