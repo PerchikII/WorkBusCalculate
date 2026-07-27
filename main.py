@@ -975,7 +975,6 @@ class StatGridLayout(MDGridLayout):
                 self.add_widget(MDLabel(text="", size_hint_x=.4))
                 self.add_widget(MDLabel(text="", size_hint_x=.3))
 
-
 class Grid_for_All_Routs(MDGridLayout):
     def __init__(self, **kwargs):
         MDGridLayout.__init__(self, **kwargs)
